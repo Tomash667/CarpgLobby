@@ -3,6 +3,7 @@
     public class Server
     {
         public int ID { get; set; }
+        public string Ip { get; set; }
         public string Name { get; set; }
         public int Players { get; set; }
         public int MaxPlayers { get; set; }

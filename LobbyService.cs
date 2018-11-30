@@ -1,4 +1,5 @@
 ﻿using CarpgLobby.Api;
+using CarpgLobby.Properties;
 using CarpgLobby.Provider;
 using CarpgLobby.Utils;
 using Microsoft.Owin.Hosting;
@@ -37,7 +38,7 @@ namespace CarpgLobby
             Logger.Info("Service start.");
             Lobby.Instance = new Lobby();
             timer = new Timer(Callback, null, 10000, Timeout.Infinite);
-            webapi = WebApp.Start<Startup>("http://localhost:8080");
+            webapi = WebApp.Start<Startup>(Settings.Default.ApiUrl);
         }
 
         protected override void OnStop()

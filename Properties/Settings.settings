@@ -8,5 +8,8 @@
     <Setting Name="ServerRefreshTime" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:00:10</Value>
     </Setting>
+    <Setting Name="ApiUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:8080</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -15,29 +15,29 @@ namespace CarpgLobby.Provider
         private int nextId = 1;
         private int timestamp = 0;
 
-        public Server CreateServer(Server serverInfo, string ip)
+        public Server CreateServer(Server server, string ip)
         {
-            serverInfo.Name = serverInfo.Name.Trim();
-            if (serverInfo.Name.Length == 0 || serverInfo.MaxPlayers <= 1)
+            server.Name = server.Name.Trim();
+            if (server.Name.Length == 0 || server.MaxPlayers <= 1)
             {
-                Logger.Error($"Validation failed for create server: name [{serverInfo.Name}], players [{serverInfo.MaxPlayers}], from {ip}.");
+                Logger.Error($"Validation failed for create server: name [{server.Name}], players [{server.MaxPlayers}], from {ip}.");
                 throw new ProviderException("Can't create server, validation failed.");
             }
-            serverInfo.ServerID = nextId;
+            server.ServerID = nextId;
             nextId += 1;
-            serverInfo.Players = 1;
-            serverInfo.LastUpdate = DateTime.Now;
-            serverInfo.Key = KeyGen.GetKey();
-            servers.Add(serverInfo);
+            server.Players = 1;
+            server.LastUpdate = DateTime.Now;
+            server.Key = KeyGen.GetKey();
+            servers.Add(server);
             changes.Add(new Change
             {
                 Type = ChangeType.Add,
-                ServerID = serverInfo.ServerID,
+                ServerID = server.ServerID,
                 Timestamp = timestamp++,
                 Date = DateTime.Now
             });
-            Logger.Info($"Created server {serverInfo.ServerID} '{serverInfo.Name}', players {serverInfo.MaxPlayers}, flags {serverInfo.Flags} by {ip}.");
-            return serverInfo;
+            Logger.Info($"Created server {server.ServerID} '{server.Name}', players {server.MaxPlayers}, flags {server.Flags} at {server.Ip}.");
+            return server;
         }
 
         public void UpdateServer(Server serverInfo, string ip)
@@ -171,6 +171,7 @@ namespace CarpgLobby.Provider
             return new Api.Model.Server
             {
                 ID = server.ServerID,
+                Ip = server.Ip,
                 Name = server.Name,
                 Players = server.Players,
                 MaxPlayers = server.MaxPlayers,

@@ -50,7 +50,8 @@ namespace CarpgLobby.Api.Controllers
                 {
                     Name = request.Name,
                     MaxPlayers = request.Players,
-                    Flags = request.Flags
+                    Flags = request.Flags,
+                    Ip = $"{Ip}:{request.Port}"
                 }, Ip);
                 return new CreateServerResponse
                 {
