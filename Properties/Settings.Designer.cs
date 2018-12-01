@@ -58,5 +58,17 @@ namespace CarpgLobby.Properties {
                 this["ApiUrl"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Verbose")]
+        public string LogLevel {
+            get {
+                return ((string)(this["LogLevel"]));
+            }
+            set {
+                this["LogLevel"] = value;
+            }
+        }
     }
 }

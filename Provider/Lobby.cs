@@ -14,6 +14,23 @@ namespace CarpgLobby.Provider
         private readonly List<Change> changes = new List<Change>();
         private int nextId = 1;
         private int timestamp = 0;
+        private int totalServers = 0;
+        private readonly DateTime startDate = DateTime.Now;
+
+        public GetInfoResponse GetInfo(string ip)
+        {
+            Logger.Verbose($"Get info from {ip}.");
+            return new GetInfoResponse
+            {
+                Changes = changes.Count,
+                Errors = Logger.Errors,
+                Ok = true,
+                Servers = servers.Count,
+                Timestamp = timestamp,
+                TotalServers = totalServers,
+                Uptime = (DateTime.Now - startDate)
+            };
+        }
 
         public Server CreateServer(Server server, string ip)
         {
@@ -29,6 +46,7 @@ namespace CarpgLobby.Provider
             server.LastUpdate = DateTime.Now;
             server.Key = KeyGen.GetKey();
             servers.Add(server);
+            ++totalServers;
             changes.Add(new Change
             {
                 Type = ChangeType.Add,
@@ -96,10 +114,10 @@ namespace CarpgLobby.Provider
             var groupped = changes.Where(x => x.Timestamp >= t)
                 .GroupBy(x => x.ServerID);
             List<Api.Model.Change> result = new List<Api.Model.Change>();
-            foreach(var group in groupped)
+            foreach (var group in groupped)
             {
                 bool added = false, updated = false, removed = false;
-                foreach(Change change in group)
+                foreach (Change change in group)
                 {
                     if (change.Type == ChangeType.Add)
                         added = true;
@@ -108,9 +126,9 @@ namespace CarpgLobby.Provider
                     else
                         removed = true;
                 }
-                if(removed)
+                if (removed)
                 {
-                    if(!added)
+                    if (!added)
                     {
                         result.Add(new Api.Model.Change
                         {
@@ -119,7 +137,7 @@ namespace CarpgLobby.Provider
                         });
                     }
                 }
-                else if(added || updated)
+                else if (added || updated)
                 {
                     Server server = servers.Single(x => x.ServerID == group.Key);
                     result.Add(new Api.Model.Change
@@ -137,7 +155,7 @@ namespace CarpgLobby.Provider
             Logger.Verbose("Refreshing servers.");
             DateTime now = DateTime.Now;
             List<Server> old = servers.Where(x => (now - x.LastUpdate) > Settings.Default.ServerRefreshTime).ToList();
-            foreach(Server server in old)
+            foreach (Server server in old)
             {
                 Logger.Info($"Removed old server {server.ServerID} '{server.Name}.");
                 changes.Add(new Change

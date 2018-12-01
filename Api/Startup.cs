@@ -11,16 +11,7 @@ namespace CarpgLobby.Api
         public void Configuration(IAppBuilder app)
         {
             var config = new HttpConfiguration();
-            config.Routes.MapHttpRoute(
-                name: "Id",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
-            config.Routes.MapHttpRoute(
-                 name: "ActionId",
-                 routeTemplate: "api/{controller}/{action}/{id}",
-                 defaults: new { id = RouteParameter.Optional }
-             );
+            config.MapHttpAttributeRoutes();
             config.Formatters.Clear();
             config.Formatters.Add(new JsonMediaTypeFormatter());
             config.Formatters.JsonFormatter.SerializerSettings =

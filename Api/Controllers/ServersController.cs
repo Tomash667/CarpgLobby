@@ -10,7 +10,18 @@ namespace CarpgLobby.Api.Controllers
 {
     public class ServersController : ApiController
     {
+        // Get info
+        [Route("api/servers/info")]
+        public GetInfoResponse GetInfo()
+        {
+            return HandleRequest(() =>
+            {
+                return Lobby.Instance.GetInfo(Ip);
+            });
+        }
+
         // Get list of servers
+        [Route("api/servers")]
         public GetServersResponse Get()
         {
             return HandleRequest(() =>
@@ -26,6 +37,7 @@ namespace CarpgLobby.Api.Controllers
         }
 
         // Get list of changes
+        [Route("api/servers/{id}")]
         public GetChangesResponse GetChanges(int id)
         {
             return HandleRequest(() =>
@@ -42,6 +54,7 @@ namespace CarpgLobby.Api.Controllers
         }
 
         // Register server
+        [Route("api/servers")]
         public CreateServerResponse Post([FromBody]CreateServerRequest request)
         {
             return HandleRequest(() =>
@@ -63,6 +76,7 @@ namespace CarpgLobby.Api.Controllers
         }
 
         // Update server
+        [Route("api/servers/{id}")]
         public BaseResponse Put(int id, [FromUri]string key, [FromUri]int players)
         {
             return HandleRequest(() =>
@@ -78,7 +92,7 @@ namespace CarpgLobby.Api.Controllers
         }
 
         // Notify that server is still runing
-        [ActionName("ping")]
+        [Route("api/servers/ping/{id}")]
         public BaseResponse PutPing(int id, [FromUri]string key)
         {
             return HandleRequest(() =>
@@ -89,6 +103,7 @@ namespace CarpgLobby.Api.Controllers
         }
 
         // Remove server
+        [Route("api/servers/{id}")]
         public BaseResponse Delete(int id, [FromUri]string key)
         {
             return HandleRequest(() =>

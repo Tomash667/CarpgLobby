@@ -11,5 +11,8 @@
     <Setting Name="ApiUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">http://localhost:8080</Value>
     </Setting>
+    <Setting Name="LogLevel" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Verbose</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

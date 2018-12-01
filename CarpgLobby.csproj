@@ -87,6 +87,7 @@
     <Compile Include="Api\Model\CreateServerRequest.cs" />
     <Compile Include="Api\Model\CreateServerResponse.cs" />
     <Compile Include="Api\Model\GetChangesResponse.cs" />
+    <Compile Include="Api\Model\GetInfoResponse.cs" />
     <Compile Include="Api\Model\GetServersResponse.cs" />
     <Compile Include="Api\Model\Server.cs" />
     <Compile Include="Api\Startup.cs" />

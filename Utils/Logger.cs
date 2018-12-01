@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using CarpgLobby.Properties;
+using Serilog;
 using System;
 using System.IO;
 
@@ -7,14 +8,30 @@ namespace CarpgLobby.Utils
     public class Logger
     {
         private static Serilog.Core.Logger log;
+        public static int Errors;
 
         public static void Init()
         {
             string dir = AppDomain.CurrentDomain.BaseDirectory + "logs";
             Directory.CreateDirectory(dir);
-            log = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.RollingFile(dir + "\\log-{Date}.txt")
+            var config = new LoggerConfiguration();
+            switch (Settings.Default.LogLevel)
+            {
+                case "Verbose":
+                    config = config.MinimumLevel.Verbose();
+                    break;
+                default:
+                case "Information":
+                    config = config.MinimumLevel.Information();
+                    break;
+                case "Error":
+                    config = config.MinimumLevel.Error();
+                    break;
+                case "Fatal":
+                    config = config.MinimumLevel.Fatal();
+                    break;
+            }
+            log = config.WriteTo.RollingFile(dir + "\\log-{Date}.txt")
                 .CreateLogger();
         }
 
@@ -31,6 +48,7 @@ namespace CarpgLobby.Utils
         public static void Error(string msg)
         {
             log.Write(Serilog.Events.LogEventLevel.Error, msg);
+            ++Errors;
         }
     }
 }
