@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28306.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarpgLobby", "CarpgLobby.csproj", "{A4989869-C070-41EF-8CE9-C033EB0C502D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarpgLobby", "CarpgLobby\CarpgLobby.csproj", "{A4989869-C070-41EF-8CE9-C033EB0C502D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
