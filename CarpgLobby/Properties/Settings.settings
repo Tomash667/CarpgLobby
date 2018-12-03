@@ -14,5 +14,11 @@
     <Setting Name="LogLevel" Type="System.String" Scope="User">
       <Value Profile="(Default)">Verbose</Value>
     </Setting>
+    <Setting Name="ProxyPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">60481</Value>
+    </Setting>
+    <Setting Name="ProxyPlayers" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">256</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

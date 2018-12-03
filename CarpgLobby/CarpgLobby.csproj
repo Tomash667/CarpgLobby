@@ -110,6 +110,7 @@
     <Compile Include="Provider\Server.cs" />
     <Compile Include="Utils\KeyGen.cs" />
     <Compile Include="Utils\Logger.cs" />
+    <Compile Include="Utils\SLikeNetProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -118,6 +119,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Lib\SLikeNetProxy.dll">
+      <Link>SLikeNetProxy.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

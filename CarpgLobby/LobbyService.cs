@@ -37,6 +37,7 @@ namespace CarpgLobby
             Logger.Init();
             Logger.Info("Service start.");
             Lobby.Instance = new Lobby();
+            SLikeNetProxy.Init();
             timer = new Timer(Callback, null, 10000, Timeout.Infinite);
             webapi = WebApp.Start<Startup>(Settings.Default.ApiUrl);
         }
@@ -45,6 +46,7 @@ namespace CarpgLobby
         {
             timer.Dispose();
             webapi.Dispose();
+            SLikeNetProxy.Shutdown();
             Logger.Info("Service shutdown.");
         }
 

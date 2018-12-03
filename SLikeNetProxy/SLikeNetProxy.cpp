@@ -24,7 +24,7 @@ std::thread thread;
 bool closing;
 void ThreadStart();
 
-EXPORT bool InitProxy(int players, int port, Callback callback)
+EXPORT bool __stdcall InitProxy(int players, int port, Callback callback)
 {
 	peer = RakPeerInterface::GetInstance();
 	server = new NatPunchthroughServer;
@@ -39,6 +39,7 @@ EXPORT bool InitProxy(int players, int port, Callback callback)
 		return false;
 	peer->SetMaximumIncomingConnections(players);
 
+	callback("Starting proxy thread.");
 	thread = std::thread(ThreadStart);
 
 	return true;
@@ -62,7 +63,7 @@ void ThreadStart()
 	RakPeerInterface::DestroyInstance(peer);
 }
 
-EXPORT void ShutdownProxy()
+EXPORT void __stdcall ShutdownProxy()
 {
 	closing = true;
 	thread.join();
