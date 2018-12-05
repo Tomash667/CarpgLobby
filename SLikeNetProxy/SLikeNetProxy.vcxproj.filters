@@ -2,5 +2,12 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="SLikeNetProxy.cpp" />
+    <ClCompile Include="ProxyServer.cpp" />
+    <ClCompile Include="Core.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ProxyServer.h" />
+    <ClInclude Include="Msg.h" />
+    <ClInclude Include="Core.h" />
   </ItemGroup>
 </Project>

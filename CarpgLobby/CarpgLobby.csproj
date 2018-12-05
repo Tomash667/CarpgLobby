@@ -108,6 +108,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\ProviderException.cs" />
     <Compile Include="Provider\Server.cs" />
+    <Compile Include="Proxy\Msg.cs" />
     <Compile Include="Utils\KeyGen.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="Utils\SLikeNetProxy.cs" />
