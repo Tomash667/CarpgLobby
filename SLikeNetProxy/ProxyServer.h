@@ -8,6 +8,7 @@ namespace SLNet
 {
 	class RakPeerInterface;
 	class NatPunchthroughServer;
+	class BitStream;
 	struct SystemAddress;
 }
 struct Server;
@@ -23,12 +24,13 @@ public:
 	void Info(const char* msg);
 	void Error(const char* msg);
 	Server* FindServer(const SLNet::SystemAddress& adr);
+	int SendMsg();
 
 	Callback callback;
 	SLNet::RakPeerInterface* peer;
 	SLNet::NatPunchthroughServer* punch_server;
+	SLNet::BitStream* buf;
 	std::thread thread;
 	vector<Server*> servers;
-	Msg msg;
 	bool closing;
 };

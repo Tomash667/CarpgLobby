@@ -1,5 +1,4 @@
 ﻿using CarpgLobby.Api.Model;
-using CarpgLobby.Properties;
 using CarpgLobby.Utils;
 using System;
 using System.Collections.Generic;
@@ -44,7 +43,6 @@ namespace CarpgLobby.Provider
             nextId += 1;
             server.Players = 1;
             server.LastUpdate = DateTime.Now;
-            server.Key = KeyGen.GetKey();
             servers.Add(server);
             ++totalServers;
             changes.Add(new Change
@@ -54,40 +52,33 @@ namespace CarpgLobby.Provider
                 Timestamp = timestamp++,
                 Date = DateTime.Now
             });
-            Logger.Info($"Created server {server.ServerID} '{server.Name}', players {server.MaxPlayers}, flags {server.Flags} at {server.Ip}.");
+            Logger.Info($"Created server {server.ServerID} '{server.Name}', players {server.MaxPlayers}, flags {server.Flags} at {ip}.");
             return server;
         }
 
-        public void UpdateServer(Server serverInfo, string ip)
+        public void UpdateServer(int id, int players, string ip)
         {
-            Server server = GetServer(serverInfo.ServerID, serverInfo.Key, ip, "update");
-            if (serverInfo.Players > server.MaxPlayers)
+            Server server = GetServer(id, ip, "update");
+            if (players < 1 || players > server.MaxPlayers)
             {
-                Logger.Error($"Validation failed for update server {server.ServerID}: players [{serverInfo.Players}/{server.MaxPlayers}], from {ip}.");
+                Logger.Error($"Validation failed for update server {server.ServerID}: players [{players}/{server.MaxPlayers}], from {ip}.");
                 throw new ProviderException("Can't update server, validation failed.");
             }
-            server.Players = serverInfo.Players;
+            server.Players = players;
             server.LastUpdate = DateTime.Now;
             changes.Add(new Change
             {
                 Type = ChangeType.Update,
-                ServerID = serverInfo.ServerID,
+                ServerID = id,
                 Timestamp = timestamp++,
                 Date = DateTime.Now
             });
             Logger.Info($"Updated server {server.ServerID} players {server.Players}/{server.MaxPlayers} by {ip}.");
         }
 
-        public void PingServer(int id, string key, string ip)
+        public void DeleteServer(int id, string ip)
         {
-            Server server = GetServer(id, key, ip, "ping");
-            server.LastUpdate = DateTime.Now;
-            Logger.Info($"Ping server {id} from {ip}.");
-        }
-
-        public void DeleteServer(int id, string key, string ip)
-        {
-            Server server = GetServer(id, key, ip, "delete");
+            Server server = GetServer(id, ip, "delete");
             servers.Remove(server);
             changes.Add(new Change
             {
@@ -150,35 +141,12 @@ namespace CarpgLobby.Provider
             return result;
         }
 
-        public void RefreshServers()
-        {
-            Logger.Verbose("Refreshing servers.");
-            DateTime now = DateTime.Now;
-            List<Server> old = servers.Where(x => (now - x.LastUpdate) > Settings.Default.ServerRefreshTime).ToList();
-            foreach (Server server in old)
-            {
-                Logger.Info($"Removed old server {server.ServerID} '{server.Name}.");
-                changes.Add(new Change
-                {
-                    Type = ChangeType.Remove,
-                    ServerID = server.ServerID,
-                    Timestamp = timestamp++,
-                    Date = DateTime.Now
-                });
-                servers.Remove(server);
-            }
-            changes.RemoveAll(x => (now - x.Date) > Settings.Default.ChangeTrackingTime);
-        }
-
-        private Server GetServer(int id, string key, string ip, string action)
+        private Server GetServer(int id, string ip, string action)
         {
             Server server = servers.SingleOrDefault(x => x.ServerID == id);
-            if (server == null || server.Key != key)
+            if (server == null)
             {
-                if (server == null)
-                    Logger.Error($"Missing server {id} to {action} from {ip}.");
-                else if (server.Key != key)
-                    Logger.Error($"Invalid server {id} key '{key}' to {action} from {ip}.");
+                Logger.Error($"Missing server {id} to {action} from {ip}.");
                 throw new ProviderException("Missing server.");
             }
             return server;
@@ -189,7 +157,7 @@ namespace CarpgLobby.Provider
             return new Api.Model.Server
             {
                 ID = server.ServerID,
-                Ip = server.Ip,
+                Guid = server.Guid,
                 Name = server.Name,
                 Players = server.Players,
                 MaxPlayers = server.MaxPlayers,

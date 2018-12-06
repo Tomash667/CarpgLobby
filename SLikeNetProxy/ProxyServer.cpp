@@ -44,7 +44,9 @@ bool ProxyServer::Init(int players, int port)
 	closing = false;
 	peer = RakPeerInterface::GetInstance();
 	punch_server = new NatPunchthroughServer;
+	buf = new BitStream;
 	peer->AttachPlugin(punch_server);
+	peer->SetTimeoutTime(5000, UNASSIGNED_SYSTEM_ADDRESS);
 	debug_logging.proxy = this;
 	punch_server->SetDebugInterface(&debug_logging);
 
@@ -80,10 +82,12 @@ void ProxyServer::Run()
 			case ID_CONNECTION_LOST:
 				if(server)
 				{
-					msg.type = MSG_REMOVE_SERVER;
-					msg.id = server->id;
-					msg.str = nullptr;
-					callback(&msg);
+					buf->Reset();
+					buf->Write(0);
+					buf->WriteCasted<byte>(MSG_REMOVE_SERVER);
+					buf->Write(packet->systemAddress.ToString());
+					buf->Write(server->id);
+					SendMsg();
 					for(auto it = servers.begin(), end = servers.end(); it != end; ++it)
 					{
 						if(*it == server)
@@ -107,11 +111,15 @@ void ProxyServer::Run()
 						Error(Format("Broken ID_HOST from %s.", packet->systemAddress.ToString()));
 					else
 					{
-						msg.type = MSG_CREATE_SERVER;
-						msg.str = name.c_str();
-						msg.players = players;
-						msg.flags = flags;
-						int id = callback(&msg);
+						buf->Reset();
+						buf->Write(0);
+						buf->WriteCasted<byte>(MSG_CREATE_SERVER);
+						buf->Write(name);
+						buf->Write(peer->GetGuidFromSystemAddress(packet->systemAddress).ToString());
+						buf->Write(packet->systemAddress.ToString());
+						buf->Write(players);
+						buf->Write(flags);
+						int id = SendMsg();
 						if(id != -1)
 						{
 							Server* server = new Server;
@@ -123,14 +131,23 @@ void ProxyServer::Run()
 				}
 				break;
 			case ID_UPDATE:
-				if(!stream.Read(msg.players))
-					Error(Format("Broken ID_UPDATE from %s.", packet->systemAddress.ToString()));
+				if(!server)
+					Error(Format("ID_UPDATE from non server %s.", packet->systemAddress.ToString()));
 				else
 				{
-					msg.type = MSG_UPDATE_SERVER;
-					msg.id = server->id;
-					msg.str = nullptr;
-					callback(&msg);
+					int players;
+					if(!stream.Read(players))
+						Error(Format("Broken ID_UPDATE from %s.", packet->systemAddress.ToString()));
+					else
+					{
+						buf->Reset();
+						buf->Write(0);
+						buf->Write(MSG_UPDATE_SERVER);
+						buf->Write(packet->systemAddress.ToString());
+						buf->Write(server->id);
+						buf->Write(players);
+						SendMsg();
+					}
 				}
 				break;
 			default:
@@ -145,6 +162,7 @@ void ProxyServer::Run()
 
 void ProxyServer::Cleanup()
 {
+	delete buf;
 	peer->DetachPlugin(punch_server);
 	delete punch_server;
 	peer->Shutdown(100);
@@ -161,16 +179,20 @@ void ProxyServer::Shutdown()
 
 void ProxyServer::Info(cstring str)
 {
-	msg.type = MSG_INFO;
-	msg.str = str;
-	callback(&msg);
+	buf->Reset();
+	buf->Write(0);
+	buf->WriteCasted<byte>(MSG_INFO);
+	buf->Write(str);
+	SendMsg();
 }
 
 void ProxyServer::Error(cstring str)
 {
-	msg.type = MSG_ERROR;
-	msg.str = str;
-	callback(&msg);
+	buf->Reset();
+	buf->Write(0);
+	buf->WriteCasted<byte>(MSG_ERROR);
+	buf->Write(str);
+	SendMsg();
 }
 
 Server* ProxyServer::FindServer(const SystemAddress& adr)
@@ -181,4 +203,12 @@ Server* ProxyServer::FindServer(const SystemAddress& adr)
 			return server;
 	}
 	return nullptr;
+}
+
+int ProxyServer::SendMsg()
+{
+	int len = buf->GetNumberOfBytesUsed() - 4;
+	int* data = (int*)buf->GetData();
+	memcpy(data, &len, sizeof(int));
+	return callback(data);
 }

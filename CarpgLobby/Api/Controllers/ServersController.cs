@@ -53,66 +53,6 @@ namespace CarpgLobby.Api.Controllers
             });
         }
 
-        // Register server
-        [Route("api/servers")]
-        public CreateServerResponse Post([FromBody]CreateServerRequest request)
-        {
-            return HandleRequest(() =>
-            {
-                var server = Lobby.Instance.CreateServer(new Provider.Server
-                {
-                    Name = request.Name,
-                    MaxPlayers = request.Players,
-                    Flags = request.Flags,
-                    Ip = $"{Ip}:{request.Port}"
-                }, Ip);
-                return new CreateServerResponse
-                {
-                    Ok = true,
-                    ServerID = server.ServerID,
-                    Key = server.Key
-                };
-            });
-        }
-
-        // Update server
-        [Route("api/servers/{id}")]
-        public BaseResponse Put(int id, [FromUri]string key, [FromUri]int players)
-        {
-            return HandleRequest(() =>
-            {
-                Lobby.Instance.UpdateServer(new Provider.Server
-                {
-                    ServerID = id,
-                    Key = key,
-                    Players = players
-                }, Ip);
-                return new BaseResponse { Ok = true };
-            });
-        }
-
-        // Notify that server is still runing
-        [Route("api/servers/ping/{id}")]
-        public BaseResponse PutPing(int id, [FromUri]string key)
-        {
-            return HandleRequest(() =>
-            {
-                Lobby.Instance.PingServer(id, key, Ip);
-                return new BaseResponse { Ok = true };
-            });
-        }
-
-        // Remove server
-        [Route("api/servers/{id}")]
-        public BaseResponse Delete(int id, [FromUri]string key)
-        {
-            return HandleRequest(() =>
-            {
-                Lobby.Instance.DeleteServer(id, key, Ip);
-                return new BaseResponse { Ok = true };
-            });
-        }
-
         private T HandleRequest<T>(Func<T> func) where T : BaseResponse, new()
         {
             try

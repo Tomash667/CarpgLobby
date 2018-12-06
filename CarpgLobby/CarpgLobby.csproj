@@ -84,13 +84,12 @@
     <Compile Include="Api\Model\BaseResponse.cs" />
     <Compile Include="Api\Model\Change.cs" />
     <Compile Include="Api\Model\ChangeType.cs" />
-    <Compile Include="Api\Model\CreateServerRequest.cs" />
-    <Compile Include="Api\Model\CreateServerResponse.cs" />
     <Compile Include="Api\Model\GetChangesResponse.cs" />
     <Compile Include="Api\Model\GetInfoResponse.cs" />
     <Compile Include="Api\Model\GetServersResponse.cs" />
     <Compile Include="Api\Model\Server.cs" />
     <Compile Include="Api\Startup.cs" />
+    <Compile Include="Extensions\BinaryReaderExtensions.cs" />
     <Compile Include="LobbyService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -108,10 +107,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\ProviderException.cs" />
     <Compile Include="Provider\Server.cs" />
-    <Compile Include="Proxy\Msg.cs" />
-    <Compile Include="Utils\KeyGen.cs" />
+    <Compile Include="Proxy\MsgType.cs" />
     <Compile Include="Utils\Logger.cs" />
-    <Compile Include="Utils\SLikeNetProxy.cs" />
+    <Compile Include="Proxy\SLikeNetProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

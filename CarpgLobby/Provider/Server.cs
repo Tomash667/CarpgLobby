@@ -5,8 +5,7 @@ namespace CarpgLobby.Provider
     public class Server
     {
         public int ServerID { get; set; }
-        public string Key { get; set; }
-        public string Ip { get; set; }
+        public string Guid { get; set; }
         public DateTime LastUpdate { get; set; }
         public string Name { get; set; }
         public int Flags { get; set; }

@@ -9,11 +9,4 @@ enum MsgType
 	MSG_REMOVE_SERVER
 };
 
-struct Msg
-{
-	MsgType type;
-	const char* str;
-	int id, players, flags;
-};
-
-typedef int(__stdcall* Callback)(Msg*);
+typedef int(__stdcall* Callback)(int*);

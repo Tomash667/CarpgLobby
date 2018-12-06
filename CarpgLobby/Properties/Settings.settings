@@ -3,10 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ChangeTrackingTime" Type="System.TimeSpan" Scope="User">
-      <Value Profile="(Default)">00:05:00</Value>
-    </Setting>
-    <Setting Name="ServerRefreshTime" Type="System.TimeSpan" Scope="User">
-      <Value Profile="(Default)">00:00:10</Value>
+      <Value Profile="(Default)">00:01:00</Value>
     </Setting>
     <Setting Name="ApiUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">http://localhost:8080</Value>

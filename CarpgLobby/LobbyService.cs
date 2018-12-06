@@ -1,6 +1,7 @@
 ﻿using CarpgLobby.Api;
 using CarpgLobby.Properties;
 using CarpgLobby.Provider;
+using CarpgLobby.Proxy;
 using CarpgLobby.Utils;
 using Microsoft.Owin.Hosting;
 using System;
@@ -11,8 +12,8 @@ namespace CarpgLobby
 {
     partial class LobbyService : ServiceBase
     {
-        private Timer timer;
         private IDisposable webapi;
+        private SLikeNetProxy proxy = new SLikeNetProxy();
 
         public LobbyService()
         {
@@ -37,23 +38,15 @@ namespace CarpgLobby
             Logger.Init();
             Logger.Info("Service start.");
             Lobby.Instance = new Lobby();
-            SLikeNetProxy.Init();
-            timer = new Timer(Callback, null, 10000, Timeout.Infinite);
+            proxy.Init();
             webapi = WebApp.Start<Startup>(Settings.Default.ApiUrl);
         }
 
         protected override void OnStop()
         {
-            timer.Dispose();
             webapi.Dispose();
-            SLikeNetProxy.Shutdown();
+            proxy.Shutdown();
             Logger.Info("Service shutdown.");
-        }
-
-        private void Callback(object state)
-        {
-            Lobby.Instance.RefreshServers();
-            timer.Change(10000, Timeout.Infinite);
         }
     }
 }

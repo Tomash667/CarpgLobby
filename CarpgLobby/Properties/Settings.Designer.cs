@@ -25,25 +25,13 @@ namespace CarpgLobby.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:05:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:01:00")]
         public global::System.TimeSpan ChangeTrackingTime {
             get {
                 return ((global::System.TimeSpan)(this["ChangeTrackingTime"]));
             }
             set {
                 this["ChangeTrackingTime"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:00:10")]
-        public global::System.TimeSpan ServerRefreshTime {
-            get {
-                return ((global::System.TimeSpan)(this["ServerRefreshTime"]));
-            }
-            set {
-                this["ServerRefreshTime"] = value;
             }
         }
         
