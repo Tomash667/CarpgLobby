@@ -5,6 +5,7 @@ using CarpgLobby.Proxy;
 using CarpgLobby.Utils;
 using Microsoft.Owin.Hosting;
 using System;
+using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
 
@@ -22,7 +23,7 @@ namespace CarpgLobby
 
         public void Start()
         {
-            OnStart(new string[0]);
+            OnStart(new string[] { "console" });
             Console.WriteLine("LobbyService is running. Press Q to stop...");
             while(true)
             {
@@ -35,7 +36,7 @@ namespace CarpgLobby
 
         protected override void OnStart(string[] args)
         {
-            Logger.Init();
+            Logger.Init(args.Contains("console"));
             Logger.Info("Service start.");
             Lobby.Instance = new Lobby();
             proxy.Init();

@@ -8,46 +8,64 @@ namespace CarpgLobby.Utils
     public class Logger
     {
         private static Serilog.Core.Logger log;
+        private static int level;
+        private static bool useConsole;
         public static int Errors;
 
-        public static void Init()
+        public static void Init(bool _useConsole)
         {
+            useConsole = _useConsole;
             string dir = AppDomain.CurrentDomain.BaseDirectory + "logs";
             Directory.CreateDirectory(dir);
-            var config = new LoggerConfiguration();
             switch (Settings.Default.LogLevel)
             {
                 case "Verbose":
-                    config = config.MinimumLevel.Verbose();
+                    level = 0;
                     break;
                 default:
                 case "Information":
-                    config = config.MinimumLevel.Information();
+                    level = 1;
                     break;
                 case "Error":
-                    config = config.MinimumLevel.Error();
+                    level = 2;
                     break;
                 case "Fatal":
-                    config = config.MinimumLevel.Fatal();
+                    level = 3;
                     break;
             }
-            log = config.WriteTo.RollingFile(dir + "\\log-{Date}.txt")
+            log = new LoggerConfiguration()
+                .WriteTo.RollingFile(dir + "\\log-{Date}.txt")
                 .CreateLogger();
         }
 
         public static void Verbose(string msg)
         {
-            log.Write(Serilog.Events.LogEventLevel.Verbose, msg);
+            if (level == 0)
+            {
+                log.Write(Serilog.Events.LogEventLevel.Verbose, msg);
+                if (useConsole)
+                    Console.WriteLine($"[Verbose] {msg}");
+            }
         }
 
         public static void Info(string msg)
         {
-            log.Write(Serilog.Events.LogEventLevel.Information, msg);
+            if (level <= 1)
+            {
+                log.Write(Serilog.Events.LogEventLevel.Information, msg);
+                if (useConsole)
+                    Console.WriteLine($"[Info] {msg}");
+            }
         }
 
         public static void Error(string msg)
         {
-            log.Write(Serilog.Events.LogEventLevel.Error, msg);
+            if (level <= 2)
+            {
+                log.Write(Serilog.Events.LogEventLevel.Error, msg);
+                if (useConsole)
+                    Console.WriteLine($"[Error] {msg}");
+            }
             ++Errors;
         }
     }

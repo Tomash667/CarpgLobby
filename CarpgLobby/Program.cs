@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.ServiceProcess;
 
 namespace CarpgLobby
@@ -9,7 +10,7 @@ namespace CarpgLobby
         {
             LobbyService service = new LobbyService();
 
-            if(Debugger.IsAttached)
+            if (Debugger.IsAttached || args.Contains("-console"))
             {
                 service.Start();
             }

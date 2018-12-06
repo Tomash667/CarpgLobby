@@ -9,7 +9,7 @@ using namespace SLNet;
 
 enum NetMsg
 {
-	ID_HOST = ID_USER_PACKET_ENUM,
+	ID_HOST = 160,
 	ID_UPDATE
 };
 
@@ -40,11 +40,11 @@ bool ProxyServer::Start(int players, int port, Callback callback)
 
 bool ProxyServer::Init(int players, int port)
 {
+	buf = new BitStream;
 	Info("Initializing proxy server.");
 	closing = false;
 	peer = RakPeerInterface::GetInstance();
 	punch_server = new NatPunchthroughServer;
-	buf = new BitStream;
 	peer->AttachPlugin(punch_server);
 	peer->SetTimeoutTime(5000, UNASSIGNED_SYSTEM_ADDRESS);
 	debug_logging.proxy = this;
@@ -87,7 +87,7 @@ void ProxyServer::Run()
 					buf->WriteCasted<byte>(MSG_REMOVE_SERVER);
 					buf->Write(packet->systemAddress.ToString());
 					buf->Write(server->id);
-					SendMsg();
+					int r = SendMsg();
 					for(auto it = servers.begin(), end = servers.end(); it != end; ++it)
 					{
 						if(*it == server)
@@ -96,6 +96,8 @@ void ProxyServer::Run()
 							break;
 						}
 					}
+					if(r == -1)
+						Error(Format("Remove server %d failed from %s.", server->id, packet->systemAddress.ToString()));
 				}
 				else
 					Info(Format("Disconnected at %s.", packet->systemAddress.ToString()));
@@ -107,14 +109,17 @@ void ProxyServer::Run()
 				{
 					string name;
 					int players, flags;
-					if(!stream.Read(name) || !stream.Read(players) || !stream.Read(flags))
+					byte len;
+					stream.Read(len);
+					name.resize(len);
+					if(!stream.Read((char*)name.c_str(), len) || !stream.Read(players) || !stream.Read(flags))
 						Error(Format("Broken ID_HOST from %s.", packet->systemAddress.ToString()));
 					else
 					{
 						buf->Reset();
 						buf->Write(0);
 						buf->WriteCasted<byte>(MSG_CREATE_SERVER);
-						buf->Write(name);
+						buf->Write(name.c_str());
 						buf->Write(peer->GetGuidFromSystemAddress(packet->systemAddress).ToString());
 						buf->Write(packet->systemAddress.ToString());
 						buf->Write(players);
@@ -127,6 +132,8 @@ void ProxyServer::Run()
 							server->adr = packet->systemAddress;
 							servers.push_back(server);
 						}
+						else
+							Error(Format("ID_HOST failed from %s.", packet->systemAddress.ToString()));
 					}
 				}
 				break;
@@ -137,7 +144,7 @@ void ProxyServer::Run()
 				{
 					int players;
 					if(!stream.Read(players))
-						Error(Format("Broken ID_UPDATE from %s.", packet->systemAddress.ToString()));
+						Error(Format("Broken ID_UPDATE %d from %s.", server->id, packet->systemAddress.ToString()));
 					else
 					{
 						buf->Reset();
@@ -146,7 +153,8 @@ void ProxyServer::Run()
 						buf->Write(packet->systemAddress.ToString());
 						buf->Write(server->id);
 						buf->Write(players);
-						SendMsg();
+						if(SendMsg() == -1)
+							Error(Format("ID_UPDATE % failed from %s.", server->id, packet->systemAddress.ToString()));
 					}
 				}
 				break;
