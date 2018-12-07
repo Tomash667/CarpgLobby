@@ -9,6 +9,11 @@ EXPORT bool __stdcall InitProxy(int players, int port, Callback callback)
 	return proxy.Start(players, port, callback);
 }
 
+EXPORT void __stdcall SetVersion(const char* ver)
+{
+	proxy.version = ver;
+}
+
 EXPORT void __stdcall ShutdownProxy()
 {
 	proxy.Shutdown();

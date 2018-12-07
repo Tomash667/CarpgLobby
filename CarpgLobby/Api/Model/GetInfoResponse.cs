@@ -10,5 +10,6 @@ namespace CarpgLobby.Api.Model
         public int Changes { get; set; }
         public int Timestamp { get; set; }
         public int Errors { get; set; }
+        public string Version { get; set; }
     }
 }

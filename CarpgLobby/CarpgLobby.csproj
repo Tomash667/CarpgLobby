@@ -80,13 +80,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\Controllers\BaseController.cs" />
     <Compile Include="Api\Controllers\ServersController.cs" />
+    <Compile Include="Api\Controllers\VersionController.cs" />
     <Compile Include="Api\Model\BaseResponse.cs" />
     <Compile Include="Api\Model\Change.cs" />
     <Compile Include="Api\Model\ChangeType.cs" />
     <Compile Include="Api\Model\GetChangesResponse.cs" />
     <Compile Include="Api\Model\GetInfoResponse.cs" />
     <Compile Include="Api\Model\GetServersResponse.cs" />
+    <Compile Include="Api\Model\GetVersionResponse.cs" />
     <Compile Include="Api\Model\Server.cs" />
     <Compile Include="Api\Startup.cs" />
     <Compile Include="Extensions\BinaryReaderExtensions.cs" />
@@ -110,6 +113,7 @@
     <Compile Include="Proxy\MsgType.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="Proxy\SLikeNetProxy.cs" />
+    <Compile Include="Utils\Version.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -6,5 +6,6 @@ namespace CarpgLobby.Api.Model
     {
         public IEnumerable<Server> Servers { get; set; }
         public int Timestamp { get; set; }
+        public string Version { get; set; }
     }
 }

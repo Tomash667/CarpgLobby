@@ -16,6 +16,9 @@ namespace CarpgLobby.Proxy
         public static extern bool InitProxy(int players, int port, [MarshalAs(UnmanagedType.FunctionPtr)]Callback callback);
 
         [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
+        public static extern void SetVersion([MarshalAs(UnmanagedType.LPStr)]string version);
+
+        [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
         public static extern void ShutdownProxy();
 
         public void Init()

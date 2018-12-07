@@ -25,6 +25,7 @@ public:
 	void Error(const char* msg);
 	Server* FindServer(const SLNet::SystemAddress& adr);
 	int SendMsg();
+	bool ReadString1(SLNet::BitStream& stream, string& str);
 
 	Callback callback;
 	SLNet::RakPeerInterface* peer;
@@ -32,5 +33,6 @@ public:
 	SLNet::BitStream* buf;
 	std::thread thread;
 	vector<Server*> servers;
+	string version;
 	bool closing;
 };

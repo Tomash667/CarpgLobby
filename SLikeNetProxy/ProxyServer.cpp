@@ -13,6 +13,14 @@ enum NetMsg
 	ID_UPDATE
 };
 
+enum HostResult
+{
+	HOST_OK,
+	HOST_BROKEN_DATA,
+	HOST_INVALID_DATA,
+	HOST_INVALID_VERSION
+};
+
 struct Server
 {
 	int id;
@@ -107,13 +115,22 @@ void ProxyServer::Run()
 					Error(Format("ID_HOST from existing server %d at %s.", server->id, packet->systemAddress.ToString()));
 				else
 				{
-					string name;
+					string name, ver;
 					int players, flags;
 					byte len;
 					stream.Read(len);
 					name.resize(len);
-					if(!stream.Read((char*)name.c_str(), len) || !stream.Read(players) || !stream.Read(flags))
+					byte b[2] = { ID_HOST, HOST_OK };
+					if(!ReadString1(stream, name) || !ReadString1(stream, ver) || !stream.Read(players) || !stream.Read(flags))
+					{
 						Error(Format("Broken ID_HOST from %s.", packet->systemAddress.ToString()));
+						b[1] = HOST_BROKEN_DATA;
+					}
+					else if(ver != version)
+					{
+						Error(Format("Invalid version '%s' from %s.", ver.c_str(), packet->systemAddress.ToString()));
+						b[1] = HOST_INVALID_VERSION;
+					}
 					else
 					{
 						buf->Reset();
@@ -133,8 +150,12 @@ void ProxyServer::Run()
 							servers.push_back(server);
 						}
 						else
+						{
 							Error(Format("ID_HOST failed from %s.", packet->systemAddress.ToString()));
+							b[1] = HOST_INVALID_DATA;
+						}
 					}
+					peer->Send((const char*)b, 2, MEDIUM_PRIORITY, RELIABLE, 0, packet->systemAddress, false);
 				}
 				break;
 			case ID_UPDATE:
@@ -219,4 +240,20 @@ int ProxyServer::SendMsg()
 	int* data = (int*)buf->GetData();
 	memcpy(data, &len, sizeof(int));
 	return callback(data);
+}
+
+bool ProxyServer::ReadString1(SLNet::BitStream& stream, string& str)
+{
+	byte len;
+	if(!stream.Read(len))
+		return false;
+	if(len == 0)
+		str.clear();
+	else
+	{
+		str.resize(len);
+		if(!stream.Read((char*)str.c_str(), len))
+			return false;
+	}
+	return true;
 }

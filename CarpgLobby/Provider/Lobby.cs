@@ -1,4 +1,5 @@
 ﻿using CarpgLobby.Api.Model;
+using CarpgLobby.Properties;
 using CarpgLobby.Utils;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,8 @@ namespace CarpgLobby.Provider
                 Servers = servers.Count,
                 Timestamp = timestamp,
                 TotalServers = totalServers,
-                Uptime = (DateTime.Now - startDate)
+                Uptime = (DateTime.Now - startDate),
+                Version = Utils.Version.Current
             };
         }
 
@@ -163,6 +165,17 @@ namespace CarpgLobby.Provider
                 MaxPlayers = server.MaxPlayers,
                 Flags = server.Flags
             };
+        }
+
+        public void SetVersion(string version, string key, string ip)
+        {
+            if (key != Settings.Default.ApiKey)
+            {
+                Logger.Error($"Invalid api key '{key}' from {ip}.");
+                throw new ProviderException("Invalid api key.");
+            }
+            Utils.Version.Current = version;
+            Logger.Info($"Set version '{version}' from {ip}.");
         }
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.Owin.Hosting;
 using System;
 using System.Linq;
 using System.ServiceProcess;
-using System.Threading;
 
 namespace CarpgLobby
 {
@@ -40,6 +39,7 @@ namespace CarpgLobby
             Logger.Info("Service start.");
             Lobby.Instance = new Lobby();
             proxy.Init();
+            Logger.Info($"Current version: {Utils.Version.Current}");
             webapi = WebApp.Start<Startup>(Settings.Default.ApiUrl);
         }
 
