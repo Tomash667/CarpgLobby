@@ -96,7 +96,8 @@ namespace CarpgLobby.Proxy
                     {
                         string ip = reader.ReadStringSimple();
                         int id = reader.ReadInt32();
-                        Lobby.Instance.DeleteServer(id, ip);
+                        bool lost_connection = reader.ReadBoolean();
+                        Lobby.Instance.DeleteServer(id, ip, lost_connection);
                         return 0;
                     }
                 default:

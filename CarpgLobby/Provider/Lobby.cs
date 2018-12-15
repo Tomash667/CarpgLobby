@@ -36,7 +36,7 @@ namespace CarpgLobby.Provider
         public Server CreateServer(Server server, string ip)
         {
             server.Name = server.Name.Trim();
-            if (server.Name.Length == 0 || server.MaxPlayers <= 1)
+            if (server.Name.Length == 0 || server.MaxPlayers < 1)
             {
                 Logger.Error($"Validation failed for create server: name [{server.Name}], players [{server.MaxPlayers}], from {ip}.");
                 throw new ProviderException("Can't create server, validation failed.");
@@ -78,7 +78,7 @@ namespace CarpgLobby.Provider
             Logger.Info($"Updated server {server.ServerID} players {server.Players}/{server.MaxPlayers} by {ip}.");
         }
 
-        public void DeleteServer(int id, string ip)
+        public void DeleteServer(int id, string ip, bool lost_connection)
         {
             Server server = GetServer(id, ip, "delete");
             servers.Remove(server);
@@ -89,7 +89,7 @@ namespace CarpgLobby.Provider
                 Timestamp = timestamp++,
                 Date = DateTime.Now
             });
-            Logger.Info($"Delete server {id} from {ip}.");
+            Logger.Info($"Delete server {id} from {ip}{(lost_connection ? " (lost connection)" : "")}.");
         }
 
         public List<Api.Model.Server> GetServers(out int timestamp, string ip)

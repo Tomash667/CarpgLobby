@@ -18,7 +18,7 @@ namespace CarpgLobby.Utils
                 {
                     try
                     {
-                        ver = File.ReadAllText(Path);
+                        Current = File.ReadAllText(Path);
                     }
                     catch (Exception)
                     {

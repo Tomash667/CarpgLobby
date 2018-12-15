@@ -95,6 +95,7 @@ void ProxyServer::Run()
 					buf->WriteCasted<byte>(MSG_REMOVE_SERVER);
 					buf->Write(packet->systemAddress.ToString());
 					buf->Write(server->id);
+					buf->Write(type == ID_CONNECTION_LOST);
 					int r = SendMsg();
 					for(auto it = servers.begin(), end = servers.end(); it != end; ++it)
 					{
@@ -107,8 +108,10 @@ void ProxyServer::Run()
 					if(r == -1)
 						Error(Format("Remove server %d failed from %s.", server->id, packet->systemAddress.ToString()));
 				}
+				else if(type == ID_CONNECTION_LOST)
+					Info(Format("Disconnected from %s.", packet->systemAddress.ToString()));
 				else
-					Info(Format("Disconnected at %s.", packet->systemAddress.ToString()));
+					Info(Format("Lost connection from %s.", packet->systemAddress.ToString()));
 				break;
 			case ID_HOST:
 				if(server)
@@ -117,9 +120,6 @@ void ProxyServer::Run()
 				{
 					string name, ver;
 					int players, flags;
-					byte len;
-					stream.Read(len);
-					name.resize(len);
 					byte b[2] = { ID_HOST, HOST_OK };
 					if(!ReadString1(stream, name) || !ReadString1(stream, ver) || !stream.Read(players) || !stream.Read(flags))
 					{
@@ -170,12 +170,12 @@ void ProxyServer::Run()
 					{
 						buf->Reset();
 						buf->Write(0);
-						buf->Write(MSG_UPDATE_SERVER);
+						buf->WriteCasted<byte>(MSG_UPDATE_SERVER);
 						buf->Write(packet->systemAddress.ToString());
 						buf->Write(server->id);
 						buf->Write(players);
 						if(SendMsg() == -1)
-							Error(Format("ID_UPDATE % failed from %s.", server->id, packet->systemAddress.ToString()));
+							Error(Format("ID_UPDATE %d failed from %s.", server->id, packet->systemAddress.ToString()));
 					}
 				}
 				break;
