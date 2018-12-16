@@ -1,5 +1,6 @@
 ﻿using CarpgLobby.Api.Model;
 using CarpgLobby.Properties;
+using CarpgLobby.Proxy;
 using CarpgLobby.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace CarpgLobby.Provider
         private int nextId = 1;
         private int timestamp = 0;
         private int totalServers = 0;
+        private int connections = 0, totalConnections = 0;
         private readonly DateTime startDate = DateTime.Now;
 
         public GetInfoResponse GetInfo(string ip)
@@ -22,14 +24,19 @@ namespace CarpgLobby.Provider
             Logger.Verbose($"Get info from {ip}.");
             return new GetInfoResponse
             {
-                Changes = changes.Count,
-                Errors = Logger.Errors,
                 Ok = true,
-                Servers = servers.Count,
-                Timestamp = timestamp,
-                TotalServers = totalServers,
                 Uptime = (DateTime.Now - startDate),
-                Version = Utils.Version.Current
+                Version = Utils.Version.Current,
+                Stats = new Dictionary<string, int>
+                {
+                    { "CurrentServers", servers.Count },
+                    { "TotalServers", totalServers },
+                    { "Timestamp", timestamp },
+                    { "Changes", changes.Count },
+                    { "Errors", Logger.Errors },
+                    { "Connections", connections },
+                    { "TotalConnections", totalConnections }
+                }
             };
         }
 
@@ -176,6 +183,17 @@ namespace CarpgLobby.Provider
             }
             Utils.Version.Current = version;
             Logger.Info($"Set version '{version}' from {ip}.");
+        }
+
+        public void UpdateStat(StatType stat)
+        {
+            if (stat == StatType.STAT_CONNECT)
+            {
+                ++connections;
+                ++totalConnections;
+            }
+            else if (stat == StatType.STAT_DISCONNECT)
+                --connections;
         }
     }
 }

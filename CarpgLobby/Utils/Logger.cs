@@ -26,14 +26,18 @@ namespace CarpgLobby.Utils
                 case "Information":
                     level = 1;
                     break;
-                case "Error":
+                case "Warning":
                     level = 2;
                     break;
-                case "Fatal":
+                case "Error":
                     level = 3;
+                    break;
+                case "Fatal":
+                    level = 4;
                     break;
             }
             log = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
                 .WriteTo.RollingFile(dir + "\\log-{Date}.txt")
                 .CreateLogger();
         }
@@ -58,9 +62,19 @@ namespace CarpgLobby.Utils
             }
         }
 
-        public static void Error(string msg)
+        public static void Warning(string msg)
         {
             if (level <= 2)
+            {
+                log.Write(Serilog.Events.LogEventLevel.Warning, msg);
+                if (useConsole)
+                    Console.WriteLine($"[Warning] {msg}");
+            }
+        }
+
+        public static void Error(string msg)
+        {
+            if (level <= 3)
             {
                 log.Write(Serilog.Events.LogEventLevel.Error, msg);
                 if (useConsole)

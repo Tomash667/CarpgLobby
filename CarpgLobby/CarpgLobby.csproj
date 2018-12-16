@@ -111,6 +111,7 @@
     <Compile Include="Provider\ProviderException.cs" />
     <Compile Include="Provider\Server.cs" />
     <Compile Include="Proxy\MsgType.cs" />
+    <Compile Include="Proxy\StatType.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="Proxy\SLikeNetProxy.cs" />
     <Compile Include="Utils\Version.cs" />

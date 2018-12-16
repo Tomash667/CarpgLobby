@@ -21,8 +21,9 @@ public:
 	void Run();
 	void Shutdown();
 	void Cleanup();
-	void Info(const char* msg);
-	void Error(const char* msg);
+	void Info(cstring msg) { Notify(MSG_INFO, msg); }
+	void Error(cstring msg) { Notify(MSG_ERROR, msg); }
+	void Notify(MsgType type, cstring msg);
 	Server* FindServer(const SLNet::SystemAddress& adr);
 	int SendMsg();
 	bool ReadString1(SLNet::BitStream& stream, string& str);

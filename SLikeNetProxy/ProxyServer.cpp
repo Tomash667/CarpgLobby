@@ -32,7 +32,7 @@ struct DebugInterface : public NatPunchthroughServerDebugInterface
 	ProxyServer* proxy;
 	void OnServerMessage(const char *msg)
 	{
-		proxy->Info(Format("Punchtrough: %s", msg));
+		proxy->Notify(MSG_VERBOSE, Format("NAT: %s", msg));
 	}
 } debug_logging;
 
@@ -85,6 +85,11 @@ void ProxyServer::Run()
 			{
 			case ID_NEW_INCOMING_CONNECTION:
 				Info(Format("New incoming connection from %s.", packet->systemAddress.ToString()));
+				buf->Reset();
+				buf->Write(0);
+				buf->WriteCasted<byte>(MSG_STAT);
+				buf->WriteCasted<byte>(STAT_CONNECT);
+				SendMsg();
 				break;
 			case ID_DISCONNECTION_NOTIFICATION:
 			case ID_CONNECTION_LOST:
@@ -112,6 +117,11 @@ void ProxyServer::Run()
 					Info(Format("Disconnected from %s.", packet->systemAddress.ToString()));
 				else
 					Info(Format("Lost connection from %s.", packet->systemAddress.ToString()));
+				buf->Reset();
+				buf->Write(0);
+				buf->WriteCasted<byte>(MSG_STAT);
+				buf->WriteCasted<byte>(STAT_DISCONNECT);
+				SendMsg();
 				break;
 			case ID_HOST:
 				if(server)
@@ -155,7 +165,7 @@ void ProxyServer::Run()
 							b[1] = HOST_INVALID_DATA;
 						}
 					}
-					peer->Send((const char*)b, 2, MEDIUM_PRIORITY, RELIABLE, 0, packet->systemAddress, false);
+					peer->Send((cstring)b, 2, MEDIUM_PRIORITY, RELIABLE, 0, packet->systemAddress, false);
 				}
 				break;
 			case ID_UPDATE:
@@ -206,20 +216,11 @@ void ProxyServer::Shutdown()
 	Cleanup();
 }
 
-void ProxyServer::Info(cstring str)
+void ProxyServer::Notify(MsgType type, cstring str)
 {
 	buf->Reset();
 	buf->Write(0);
-	buf->WriteCasted<byte>(MSG_INFO);
-	buf->Write(str);
-	SendMsg();
-}
-
-void ProxyServer::Error(cstring str)
-{
-	buf->Reset();
-	buf->Write(0);
-	buf->WriteCasted<byte>(MSG_ERROR);
+	buf->WriteCasted<byte>(type);
 	buf->Write(str);
 	SendMsg();
 }

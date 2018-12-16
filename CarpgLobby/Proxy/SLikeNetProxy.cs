@@ -60,14 +60,27 @@ namespace CarpgLobby.Proxy
             MsgType type = (MsgType)reader.ReadByte();
             switch (type)
             {
+                case MsgType.MSG_VERBOSE:
                 case MsgType.MSG_INFO:
+                case MsgType.MSG_WARNING:
                 case MsgType.MSG_ERROR:
                     {
                         string msg = reader.ReadStringSimple();
-                        if (type == MsgType.MSG_INFO)
-                            Logger.Info(msg);
-                        else
-                            Logger.Error(msg);
+                        switch (type)
+                        {
+                            case MsgType.MSG_VERBOSE:
+                                Logger.Verbose(msg);
+                                break;
+                            case MsgType.MSG_INFO:
+                                Logger.Info(msg);
+                                break;
+                            case MsgType.MSG_WARNING:
+                                Logger.Warning(msg);
+                                break;
+                            case MsgType.MSG_ERROR:
+                                Logger.Error(msg);
+                                break;
+                        }
                         return 0;
                     }
                 case MsgType.MSG_CREATE_SERVER:
@@ -100,6 +113,12 @@ namespace CarpgLobby.Proxy
                         int id = reader.ReadInt32();
                         bool lost_connection = reader.ReadBoolean();
                         Lobby.Instance.DeleteServer(id, ip, lost_connection);
+                        return 0;
+                    }
+                case MsgType.MSG_STAT:
+                    {
+                        StatType stat = (StatType)reader.ReadByte();
+                        Lobby.Instance.UpdateStat(stat);
                         return 0;
                     }
                 default:
