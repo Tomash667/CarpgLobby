@@ -10,20 +10,22 @@ namespace CarpgLobby.Proxy
 {
     public class SLikeNetProxy
     {
-        public delegate int Callback(IntPtr ptr);
+        private delegate int Callback(IntPtr ptr);
+        private static Callback callback;
 
         [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
-        public static extern bool InitProxy(int players, int port, [MarshalAs(UnmanagedType.FunctionPtr)]Callback callback);
+        private static extern bool InitProxy(int players, int port, [MarshalAs(UnmanagedType.FunctionPtr)]Callback callback);
 
         [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
         public static extern void SetVersion([MarshalAs(UnmanagedType.LPStr)]string version);
 
         [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
-        public static extern void ShutdownProxy();
+        private static extern void ShutdownProxy();
 
         public void Init()
         {
-            if (!InitProxy(Settings.Default.ProxyPlayers, Settings.Default.ProxyPort, HandleMessage))
+            callback = new Callback(HandleMessage);
+            if (!InitProxy(Settings.Default.ProxyPlayers, Settings.Default.ProxyPort, callback))
                 throw new Exception("Failed to init proxy.");
         }
 
