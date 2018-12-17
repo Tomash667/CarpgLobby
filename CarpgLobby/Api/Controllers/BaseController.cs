@@ -13,6 +13,7 @@ namespace CarpgLobby.Api.Controllers
         {
             try
             {
+                Lobby.Instance.requests++;
                 return func();
             }
             catch (ProviderException ex)

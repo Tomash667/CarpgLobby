@@ -58,9 +58,18 @@ bool ProxyServer::Init(int players, int port)
 	debug_logging.proxy = this;
 	punch_server->SetDebugInterface(&debug_logging);
 
-	SocketDescriptor sd(port, 0);
-	sd.socketFamily = AF_INET;
-	StartupResult r = peer->Startup(players, &sd, 1);
+	SocketDescriptor sd[2];
+	sd[0].port = port;
+	int sd_count = 1;
+	if(peer->GetNumberOfAddresses() > 1)
+	{
+		strcpy_s(sd[0].hostAddress, peer->GetLocalIP(0));
+		sd[1].port = port + 1;
+		strcpy_s(sd[1].hostAddress, peer->GetLocalIP(1));
+		Info("Using two IP addresses.");
+		sd_count = 2;
+	}
+	StartupResult r = peer->Startup(players, sd, sd_count);
 	if(r != 0)
 	{
 		Error(Format("Failed to initialize proxy server (%d).", r));

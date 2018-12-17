@@ -15,8 +15,8 @@ namespace CarpgLobby.Provider
         private readonly List<Change> changes = new List<Change>();
         private int nextId = 1;
         private int timestamp = 0;
-        private int totalServers = 0;
-        private int connections = 0, totalConnections = 0;
+        private int totalServers = 0, connections = 0, totalConnections = 0;
+        public int requests = 0;
         private readonly DateTime startDate = DateTime.Now;
 
         public GetInfoResponse GetInfo(string ip)
@@ -35,7 +35,8 @@ namespace CarpgLobby.Provider
                     { "Changes", changes.Count },
                     { "Errors", Logger.Errors },
                     { "Connections", connections },
-                    { "TotalConnections", totalConnections }
+                    { "TotalConnections", totalConnections },
+                    { "Requests", requests }
                 }
             };
         }
