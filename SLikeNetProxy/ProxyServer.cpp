@@ -17,8 +17,7 @@ enum HostResult
 {
 	HOST_OK,
 	HOST_BROKEN_DATA,
-	HOST_INVALID_DATA,
-	HOST_INVALID_VERSION
+	HOST_INVALID_DATA
 };
 
 struct Server
@@ -137,18 +136,13 @@ void ProxyServer::Run()
 					Error(Format("ID_HOST from existing server %d at %s.", server->id, packet->systemAddress.ToString()));
 				else
 				{
-					string name, ver;
-					int players, flags;
+					string name;
+					int players, flags, version;
 					byte b[2] = { ID_HOST, HOST_OK };
-					if(!ReadString1(stream, name) || !ReadString1(stream, ver) || !stream.Read(players) || !stream.Read(flags))
+					if(!ReadString1(stream, name) || !stream.Read(players) || !stream.Read(flags) || !stream.Read(version))
 					{
 						Error(Format("Broken ID_HOST from %s.", packet->systemAddress.ToString()));
 						b[1] = HOST_BROKEN_DATA;
-					}
-					else if(ver != version)
-					{
-						Error(Format("Invalid version '%s' from %s.", ver.c_str(), packet->systemAddress.ToString()));
-						b[1] = HOST_INVALID_VERSION;
 					}
 					else
 					{
@@ -160,6 +154,7 @@ void ProxyServer::Run()
 						buf->Write(packet->systemAddress.ToString());
 						buf->Write(players);
 						buf->Write(flags);
+						buf->Write(version);
 						int id = SendMsg();
 						if(id != -1)
 						{

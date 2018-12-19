@@ -17,9 +17,6 @@ namespace CarpgLobby.Proxy
         private static extern bool InitProxy(int players, int port, [MarshalAs(UnmanagedType.FunctionPtr)]Callback callback);
 
         [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
-        public static extern void SetVersion([MarshalAs(UnmanagedType.LPStr)]string version);
-
-        [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
         private static extern void ShutdownProxy();
 
         public void Init()
@@ -43,11 +40,11 @@ namespace CarpgLobby.Proxy
                 {
                     return ProcessMessage(reader);
                 }
-                catch(ProviderException)
+                catch (ProviderException)
                 {
                     return -1;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Logger.Error($"Unhandled exception: {ex}");
                     return -1;
@@ -90,12 +87,14 @@ namespace CarpgLobby.Proxy
                         string ip = reader.ReadStringSimple();
                         int players = reader.ReadInt32();
                         int flags = reader.ReadInt32();
+                        int version = reader.ReadInt32();
                         Server server = Lobby.Instance.CreateServer(new Server
                         {
                             Name = name,
                             Guid = guid,
                             MaxPlayers = players,
-                            Flags = flags
+                            Flags = flags,
+                            Version = version
                         }, ip);
                         return server.ServerID;
                     }

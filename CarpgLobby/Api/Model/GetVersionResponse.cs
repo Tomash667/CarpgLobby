@@ -2,6 +2,7 @@
 {
     public class GetVersionResponse : BaseResponse
     {
-        public string Version { get; set; }
+        public int Version { get; set; }
+        public string VersionString { get; set; }
     }
 }

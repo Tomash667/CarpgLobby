@@ -171,7 +171,8 @@ namespace CarpgLobby.Provider
                 Name = server.Name,
                 Players = server.Players,
                 MaxPlayers = server.MaxPlayers,
-                Flags = server.Flags
+                Flags = server.Flags,
+                Version = server.Version
             };
         }
 

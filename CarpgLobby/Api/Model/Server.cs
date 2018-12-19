@@ -8,5 +8,6 @@
         public int Players { get; set; }
         public int MaxPlayers { get; set; }
         public int Flags { get; set; }
+        public int Version { get; set; }
     }
 }

@@ -17,7 +17,8 @@ namespace CarpgLobby.Api.Controllers
                 return new GetVersionResponse
                 {
                     Ok = true,
-                    Version = Utils.Version.Current
+                    Version = Version.Number,
+                    VersionString = Version.Current
                 };
             });
         }

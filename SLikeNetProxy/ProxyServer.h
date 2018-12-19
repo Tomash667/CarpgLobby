@@ -34,6 +34,5 @@ public:
 	SLNet::BitStream* buf;
 	std::thread thread;
 	vector<Server*> servers;
-	string version;
 	bool closing;
 };

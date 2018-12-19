@@ -11,5 +11,6 @@ namespace CarpgLobby.Provider
         public int Flags { get; set; }
         public int Players { get; set; }
         public int MaxPlayers { get; set; }
+        public int Version { get; set; }
     }
 }

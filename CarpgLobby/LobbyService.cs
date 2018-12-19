@@ -24,7 +24,7 @@ namespace CarpgLobby
         {
             OnStart(new string[] { "console" });
             Console.WriteLine("LobbyService is running. Press Q to stop...");
-            while(true)
+            while (true)
             {
                 var key = Console.ReadKey(true);
                 if (key.KeyChar == 'Q')
