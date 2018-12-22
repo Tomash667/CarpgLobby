@@ -49,5 +49,10 @@ namespace CarpgLobby
             proxy.Shutdown();
             Logger.Info("Service shutdown.");
         }
+
+        protected override void OnShutdown()
+        {
+            OnStop();
+        }
     }
 }
