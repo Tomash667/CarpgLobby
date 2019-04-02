@@ -176,13 +176,8 @@ namespace CarpgLobby.Provider
             };
         }
 
-        public void SetVersion(string version, string key, string ip)
+        public void SetVersion(string version, string ip)
         {
-            if (key != Settings.Default.ApiKey)
-            {
-                Logger.Error($"Invalid api key '{key}' from {ip}.");
-                throw new ProviderException("Invalid api key.");
-            }
             Utils.Version.Current = version;
             Logger.Info($"Set version '{version}' from {ip}.");
         }

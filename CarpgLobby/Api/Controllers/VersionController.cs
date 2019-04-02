@@ -23,13 +23,37 @@ namespace CarpgLobby.Api.Controllers
             });
         }
 
-        // Set version
-        [Route("api/version")]
-        public BaseResponse PostVersion([FromUri]string version, [FromUri]string key)
+        // Get version
+        [Route("api/version/details")]
+        [TokenAuthentication]
+        public GetVersionDetailsResponse GetVersionDetails()
         {
             return HandleRequest(() =>
             {
-                Lobby.Instance.SetVersion(version, key, Ip);
+                Logger.Verbose($"Get version details from {Ip}.");
+                FtpProvider ftp = new FtpProvider();
+                int version2 = ftp.GetVersion();
+                return new GetVersionDetailsResponse
+                {
+                    Ok = true,
+                    Version = Version.Number,
+                    VersionString = Version.Current,
+                    Version2 = version2,
+                    VersionString2 = Version.ToString(version2)
+                };
+            });
+        }
+
+        // Set version
+        [Route("api/version")]
+        [TokenAuthentication]
+        public BaseResponse PostVersion([FromUri]string version)
+        {
+            return HandleRequest(() =>
+            {
+                Lobby.Instance.SetVersion(version, Ip);
+                FtpProvider ftp = new FtpProvider();
+                ftp.SetVersion(Version.ParseVersion(version));
                 return new BaseResponse { Ok = true };
             });
         }

@@ -94,5 +94,41 @@ namespace CarpgLobby.Properties {
                 this["ApiKey"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string FtpHost {
+            get {
+                return ((string)(this["FtpHost"]));
+            }
+            set {
+                this["FtpHost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("login")]
+        public string FtpLogin {
+            get {
+                return ((string)(this["FtpLogin"]));
+            }
+            set {
+                this["FtpLogin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("123456")]
+        public string FtpPassword {
+            get {
+                return ((string)(this["FtpPassword"]));
+            }
+            set {
+                this["FtpPassword"] = value;
+            }
+        }
     }
 }

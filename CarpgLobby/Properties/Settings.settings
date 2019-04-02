@@ -20,5 +20,14 @@
     <Setting Name="ApiKey" Type="System.String" Scope="User">
       <Value Profile="(Default)">123456</Value>
     </Setting>
+    <Setting Name="FtpHost" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="FtpLogin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">login</Value>
+    </Setting>
+    <Setting Name="FtpPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">123456</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
