@@ -1,5 +1,4 @@
 ﻿using CarpgLobby.Api.Model;
-using CarpgLobby.Properties;
 using CarpgLobby.Proxy;
 using CarpgLobby.Utils;
 using System;
@@ -18,15 +17,26 @@ namespace CarpgLobby.Provider
         private int totalServers = 0, connections = 0, totalConnections = 0;
         public int requests = 0;
         private readonly DateTime startDate = DateTime.Now;
-
-        public GetInfoResponse GetInfo(string ip)
+        private readonly Repository repository = new Repository();
+        public string VersionStr
         {
-            Logger.Verbose($"Get info from {ip}.");
+            get { return Utils.Version.ToString(repository.version); }
+            set { repository.version = Utils.Version.ParseVersion(value); }
+        }
+        public int Version => repository.version;
+
+        public Lobby()
+        {
+            repository.Load();
+        }
+
+        public GetInfoResponse GetInfo()
+        {
             return new GetInfoResponse
             {
                 Ok = true,
                 Uptime = (DateTime.Now - startDate),
-                Version = Utils.Version.Current,
+                Version = VersionStr,
                 Stats = new Dictionary<string, int>
                 {
                     { "CurrentServers", servers.Count },
@@ -100,16 +110,14 @@ namespace CarpgLobby.Provider
             Logger.Info($"Delete server {id} from {ip}{(lost_connection ? " (lost connection)" : "")}.");
         }
 
-        public List<Api.Model.Server> GetServers(out int timestamp, string ip)
+        public List<Api.Model.Server> GetServers(out int timestamp)
         {
-            Logger.Verbose($"Get servers from {ip}.");
             timestamp = changes.Count;
             return servers.Select(x => Map(x)).ToList();
         }
 
-        public List<Api.Model.Change> GetChanges(ref int timestamp, string ip)
+        public List<Api.Model.Change> GetChanges(ref int timestamp)
         {
-            Logger.Verbose($"Get server changes at {timestamp} from {ip}.");
             int t = timestamp;
             timestamp = this.timestamp;
             var groupped = changes.Where(x => x.Timestamp >= t)
@@ -176,10 +184,12 @@ namespace CarpgLobby.Provider
             };
         }
 
-        public void SetVersion(string version, string ip)
+        public void SetVersion(string version)
         {
-            Utils.Version.Current = version;
-            Logger.Info($"Set version '{version}' from {ip}.");
+            VersionStr = version;
+            repository.Save();
+            FtpProvider ftp = new FtpProvider();
+            ftp.SetVersion(Utils.Version.ParseVersion(version));
         }
 
         public void UpdateStat(StatType stat)
@@ -191,6 +201,32 @@ namespace CarpgLobby.Provider
             }
             else if (stat == StatType.STAT_DISCONNECT)
                 --connections;
+        }
+
+        public Dictionary<string, string> GetChangelog(string lang)
+        {
+            if (string.IsNullOrWhiteSpace(lang))
+                return repository.changelog;
+            else
+            {
+                Dictionary<string, string> result = new Dictionary<string, string>();
+                if (repository.changelog.TryGetValue(lang, out string changelog))
+                    result[lang] = changelog;
+                else if (repository.changelog.TryGetValue("en", out changelog))
+                    result["en"] = changelog;
+                return result;
+            }
+        }
+
+        public void SetChangelog(string lang, string changelog)
+        {
+            if (string.IsNullOrWhiteSpace(lang))
+                throw new Exception("Invalid language.");
+            if (string.IsNullOrWhiteSpace(changelog))
+                repository.changelog.Remove(lang);
+            else
+                repository.changelog[lang] = changelog;
+            repository.Save();
         }
     }
 }

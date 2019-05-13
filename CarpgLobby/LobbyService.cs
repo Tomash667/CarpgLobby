@@ -39,7 +39,7 @@ namespace CarpgLobby
             Logger.Info("Service start.");
             Lobby.Instance = new Lobby();
             proxy.Init();
-            Logger.Info($"Current version: {Utils.Version.Current}");
+            Logger.Info($"Current version: {Lobby.Instance.VersionStr}");
             webapi = WebApp.Start<Startup>(Settings.Default.ApiUrl);
         }
 

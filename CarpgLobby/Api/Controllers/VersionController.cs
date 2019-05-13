@@ -1,6 +1,7 @@
 ﻿using CarpgLobby.Api.Model;
 using CarpgLobby.Provider;
 using CarpgLobby.Utils;
+using System.Collections.Generic;
 using System.Web.Http;
 
 namespace CarpgLobby.Api.Controllers
@@ -17,8 +18,8 @@ namespace CarpgLobby.Api.Controllers
                 return new GetVersionResponse
                 {
                     Ok = true,
-                    Version = Version.Number,
-                    VersionString = Version.Current
+                    Version = Lobby.Instance.Version,
+                    VersionString = Lobby.Instance.VersionStr
                 };
             });
         }
@@ -36,8 +37,8 @@ namespace CarpgLobby.Api.Controllers
                 return new GetVersionDetailsResponse
                 {
                     Ok = true,
-                    Version = Version.Number,
-                    VersionString = Version.Current,
+                    Version = Lobby.Instance.Version,
+                    VersionString = Lobby.Instance.VersionStr,
                     Version2 = version2,
                     VersionString2 = Version.ToString(version2)
                 };
@@ -47,13 +48,48 @@ namespace CarpgLobby.Api.Controllers
         // Set version
         [Route("api/version")]
         [TokenAuthentication]
-        public BaseResponse PostVersion([FromUri]string version)
+        public BaseResponse PostVersion([FromUri]string version, [FromBody]Dictionary<string, string> changelog)
         {
             return HandleRequest(() =>
             {
-                Lobby.Instance.SetVersion(version, Ip);
-                FtpProvider ftp = new FtpProvider();
-                ftp.SetVersion(Version.ParseVersion(version));
+                Logger.Info($"Set version '{version}' from {Ip}.");
+                Lobby.Instance.SetVersion(version);
+                if (changelog?.Count > 0)
+                {
+                    foreach (var item in changelog)
+                    {
+                        Logger.Verbose($"Set changelog '{item.Key}' to '{item.Value}' from {Ip}.");
+                        Lobby.Instance.SetChangelog(item.Key, item.Value);
+                    }
+                }
+                return new BaseResponse { Ok = true };
+            });
+        }
+
+        // Get version changelog (for all or single language)
+        [Route("api/version/changelog")]
+        public GetChangelogResponse GetChangelog([FromUri]string lang)
+        {
+            return HandleRequest(() =>
+            {
+                Logger.Verbose($"Get changelog '{lang}' from {Ip}.");
+                return new GetChangelogResponse
+                {
+                    Ok = true,
+                    Changes = Lobby.Instance.GetChangelog(lang)
+                };
+            });
+        }
+
+        // Set version changelog for language
+        [Route("api/version/changelog")]
+        [TokenAuthentication]
+        public BaseResponse PostChangelog([FromUri]string lang, [FromBody]string changelog)
+        {
+            return HandleRequest(() =>
+            {
+                Logger.Verbose($"Set changelog '{lang}' to '{changelog}' from {Ip}.");
+                Lobby.Instance.SetChangelog(lang, changelog);
                 return new BaseResponse { Ok = true };
             });
         }

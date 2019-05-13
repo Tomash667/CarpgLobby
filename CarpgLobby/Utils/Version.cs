@@ -1,45 +1,9 @@
 ﻿using System;
-using System.IO;
 
 namespace CarpgLobby.Utils
 {
     public static class Version
     {
-        private static string ver;
-
-        private static string Path => AppDomain.CurrentDomain.BaseDirectory + "version.txt";
-
-        public static string Current
-        {
-            get
-            {
-                if (ver == null)
-                {
-                    try
-                    {
-                        Current = File.ReadAllText(Path);
-                        Number = ParseVersion(Current);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (!(ex is FileNotFoundException))
-                            Logger.Error(ex.ToString());
-                        Current = "0";
-                        Number = 0;
-                    }
-                }
-                return ver;
-            }
-            set
-            {
-                Number = ParseVersion(value);
-                ver = value;
-                File.WriteAllText(Path, value);
-            }
-        }
-
-        public static int Number { get; private set; }
-
         public static int ParseVersion(string str)
         {
             string[] parts = str.Split(new char[] { '.' });

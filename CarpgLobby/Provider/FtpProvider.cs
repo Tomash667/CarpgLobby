@@ -10,8 +10,13 @@ namespace CarpgLobby.Provider
         private static readonly string path = "/domains/carpg.pl/public_html/carpgdata/wersja";
         private static readonly uint sign = 0x475052CA;
 
+        public bool Enabled => !string.IsNullOrWhiteSpace(Settings.Default.FtpHost);
+
         public int GetVersion()
         {
+            if (!Enabled)
+                return 0;
+
             using (var client = GetClient())
             using (var stream = new BinaryReader(client.OpenRead(path)))
             {
@@ -24,6 +29,9 @@ namespace CarpgLobby.Provider
 
         public void SetVersion(int version)
         {
+            if (!Enabled)
+                return;
+
             using (var client = GetClient())
             {
                 if (client.FileExists(path))
@@ -41,9 +49,11 @@ namespace CarpgLobby.Provider
 
         private FtpClient GetClient()
         {
-            FtpClient client = new FtpClient();
-            client.Host = Settings.Default.FtpHost;
-            client.Credentials = new System.Net.NetworkCredential(Settings.Default.FtpLogin, Settings.Default.FtpPassword);
+            FtpClient client = new FtpClient
+            {
+                Host = Settings.Default.FtpHost,
+                Credentials = new System.Net.NetworkCredential(Settings.Default.FtpLogin, Settings.Default.FtpPassword)
+            };
             return client;
         }
     }

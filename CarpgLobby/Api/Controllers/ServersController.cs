@@ -1,5 +1,6 @@
 ﻿using CarpgLobby.Api.Model;
 using CarpgLobby.Provider;
+using CarpgLobby.Utils;
 using System.Collections.Generic;
 using System.Web.Http;
 
@@ -13,7 +14,8 @@ namespace CarpgLobby.Api.Controllers
         {
             return HandleRequest(() =>
             {
-                return Lobby.Instance.GetInfo(Ip);
+                Logger.Verbose($"Get info from {Ip}.");
+                return Lobby.Instance.GetInfo();
             });
         }
 
@@ -23,13 +25,14 @@ namespace CarpgLobby.Api.Controllers
         {
             return HandleRequest(() =>
             {
-                List<Model.Server> servers = Lobby.Instance.GetServers(out int timestamp, Ip);
+                Logger.Verbose($"Get servers from {Ip}.");
+                List<Model.Server> servers = Lobby.Instance.GetServers(out int timestamp);
                 return new GetServersResponse
                 {
                     Ok = true,
                     Servers = servers,
                     Timestamp = timestamp,
-                    Version = Utils.Version.Current
+                    Version = Lobby.Instance.VersionStr
                 };
             });
         }
@@ -40,8 +43,9 @@ namespace CarpgLobby.Api.Controllers
         {
             return HandleRequest(() =>
             {
+                Logger.Verbose($"Get server changes at {id} from {Ip}.");
                 int timestamp = id;
-                List<Model.Change> changes = Lobby.Instance.GetChanges(ref timestamp, Ip);
+                List<Model.Change> changes = Lobby.Instance.GetChanges(ref timestamp);
                 return new GetChangesResponse
                 {
                     Ok = true,
