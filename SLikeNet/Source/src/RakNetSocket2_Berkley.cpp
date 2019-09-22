@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -22,6 +22,12 @@
 
 // Every platform except windows store 8 and native client supports Berkley sockets
 #if !defined(WINDOWS_STORE_RT) && !defined(__native_client__)
+
+#ifdef _WIN32
+#include <tchar.h>	// used for _tprintf() (via RAKNET_DEBUG_TPRINTF)
+#else
+#include "slikenet/LinuxStrings.h" // used for _stricmp()
+#endif
 
 #include "slikenet/Itoa.h"
 
@@ -121,7 +127,7 @@ void RNS2_Berkley::GetSystemAddressIPV4And6 ( RNS2Socket rns2Socket, SystemAddre
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, static_cast<LPTSTR>(messageBuffer));
+		RAKNET_DEBUG_TPRINTF( _T("getsockname failed:Error code - %d\n%s"), dwIOError, static_cast<LPTSTR>(messageBuffer));
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -222,7 +228,7 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 		return BR_FAILED_TO_BIND_SOCKET;
 #elif (defined(__GNUC__) || defined(__GCCXML__) ) && !defined(_WIN32)
 		closesocket__(rns2Socket);
-		switch (ret)
+		switch (errno)
 		{
 		case EBADF:
 			RAKNET_DEBUG_PRINTF("bind__(): sockfd is not a valid descriptor.\n"); break;
@@ -252,7 +258,7 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 			RAKNET_DEBUG_PRINTF("bind__(): Too many symbolic links were encountered in resolving my_addr.\n"); break;
 
 		default:
-			RAKNET_DEBUG_PRINTF("Unknown bind__() error %i.\n", ret); break;
+			RAKNET_DEBUG_PRINTF("Unknown bind__() error %i.\n", errno); break;
 		}
 
 		return BR_FAILED_TO_BIND_SOCKET;
@@ -323,8 +329,14 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4And6( RNS2_BerkleyBindParameters *bin
 		ret = bind__(rns2Socket, aip->ai_addr, (int) aip->ai_addrlen );
 		if (ret>=0)
 		{
-			// Is this valid?
-			memcpy(&boundAddress.address.addr6, aip->ai_addr, sizeof(boundAddress.address.addr6));
+			if (aip->ai_family == AF_INET)
+			{
+				memcpy(&boundAddress.address.addr4, aip->ai_addr, sizeof(sockaddr_in));
+			}
+			else
+			{
+				memcpy(&boundAddress.address.addr6, aip->ai_addr, sizeof(sockaddr_in6));
+			}
 
 			freeaddrinfo(servinfo); // free the linked-list
 
@@ -396,7 +408,7 @@ void RNS2_Berkley::RecvFromBlockingIPV4And6(RNS2RecvStruct *recvFromStruct)
 				NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 				( LPTSTR ) & messageBuffer, 0, NULL );
 			// I see this hit on XP with IPV6 for some reason
-			RAKNET_DEBUG_PRINTF( "Warning: recvfrom failed:Error code - %d\n%s", dwIOError, static_cast<LPTSTR>(messageBuffer) );
+			RAKNET_DEBUG_TPRINTF( _T("Warning: recvfrom failed:Error code - %d\n%s"), dwIOError, static_cast<LPTSTR>(messageBuffer) );
 			LocalFree( messageBuffer );
 		}
 	}	

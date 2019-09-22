@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -34,14 +34,20 @@
 #endif
 
 // Define _FILE_AND_LINE_ to "",0 if you want to strip out file and line info for memory tracking from the EXE
+// SWIG: This macro must be excluded from generating C# wrappers/interfaces since SWIG would try to handle the
+//       macro as a constant definition and fail to convert it, issuing the following warning:
+//       "warning 305: Bad constant value (ignored)." - see SLNET-227 for details
+//       Since this is not a constant definition at all, the correct solution is to exclude this macro therefore.
 #ifndef _FILE_AND_LINE_
+#ifndef SWIG
 #ifdef _RETAIL
 // retail builds do not contain source-code related information in order to reduce the overall EXE size
 #define _FILE_AND_LINE_ "",0
 #else
 #define _FILE_AND_LINE_ __FILE__,__LINE__
-#endif
-#endif
+#endif // _RETAIL
+#endif // SWIG
+#endif // _FILE_AND_LINE_
 
 /// Define RAKNET_COMPATIBILITY to enable API compatibility with RakNet.
 /// This allows you to keep existing code which was compatible with RakNet 4.082 unmodified and
@@ -52,7 +58,7 @@
 /// Define __BITSTREAM_NATIVE_END to NOT support endian swapping in the BitStream class.  This is faster and is what you should use
 /// unless you actually plan to have different endianness systems connect to each other
 /// Enabled by default.
-#define __BITSTREAM_NATIVE_END
+// #define __BITSTREAM_NATIVE_END
 
 /// Maximum (stack) size to use with _alloca before using new and delete instead.
 #ifndef MAX_ALLOCA_STACK_ALLOCATION
@@ -75,7 +81,7 @@
 /// If defined, OpenSSL is enabled for the class TCPInterface
 /// This is necessary to use the SendEmail class with Google POP servers
 /// Note that OpenSSL carries its own license restrictions that you should be aware of. If you don't agree, don't enable this define
-/// This also requires that you enable header search paths to DependentExtensions\openssl-1.0.0d
+/// This also requires that you enable header search paths to DependentExtensions/openssl-1.0.0d/include
 // #define OPEN_SSL_CLIENT_SUPPORT
 #ifndef OPEN_SSL_CLIENT_SUPPORT
 #define OPEN_SSL_CLIENT_SUPPORT 0
@@ -217,10 +223,23 @@
 
 //#define USE_THREADED_SEND
 
+// @since 0.1.1: added
+// Controls the maximum retrievable filesize for incoming files using FileListTransfer.
+// The configured limit only applies for files which are transferred incrementally (which basically applies to any larger file).
+// Note that this also impacts the upper limit for memory allocations. It's suggested to redefine the value to a reasonable smaller size in the defineoverrides.h header file.
+// For backwards compatibility with RakNet, the default is set to 4 GiB-1.
+// #low - consider introducing GiB/MiB/KiB-functions and then define as GiB(4)?
+#ifndef SLNET_MAX_RETRIEVABLE_FILESIZE
+#define SLNET_MAX_RETRIEVABLE_FILESIZE (0xFFFFFFFF)
+#endif
+
+// #blocker_2_0 - remove RAKNET_COMPATIBILITY
 #ifdef RAKNET_COMPATIBILITY
-// set the namespace RakNet as alias to the SLikeNet namespace
-namespace SLNet { }
-namespace RakNet = SLNet;
+// note: we cannot use namespace aliases here since we need to ensure ABI compatibility with shared libraries/DLLs
+// if we'd use a namespace alias, the names in the DLLs would still point to the actual namespace (SLNet) rather
+// than the alias namespace and old apps would not be able to use the DLL as an in-place replacement
+// hence, go with a simple preprocessor macro which will replace the SLNet namespace names with RakNet
+#define SLNet RakNet
 #endif
 
 #endif // __RAKNET_DEFINES_H

@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2019, SLikeSoft UG (haftungsbeschrÃ¤nkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -284,6 +284,7 @@ namespace SLNet
 		/// \param[in] varString The value to read
 		/// \param[in] varStringLength The length of the given varString array (in wchar_t)
 		/// \return true on success, false on failure.
+		bool Read(wchar_t *&varString);
 		bool Read(wchar_t *&varString, size_t varStringLength);
 
 		/// \brief Read any integral type from a bitstream.  
@@ -312,6 +313,7 @@ namespace SLNet
 		/// \param[in] varString The value to read
 		/// \param[in] varStringLength The length of the given varString array (in wchar_t)
 		/// \return true on success, false on failure.
+		bool ReadCompressed(wchar_t *&varString);
 		bool ReadCompressed(wchar_t *&varString, size_t varStringLength);
 
 		/// \brief Read any integral type from a bitstream.  
@@ -493,8 +495,10 @@ namespace SLNet
 		void AssertStreamEmpty( void );
 
 		/// \brief RAKNET_DEBUG_PRINTF the bits in the stream.  Great for debugging.
+		void PrintBits( char *out ) const;
 		void PrintBits( char *out, size_t outLength ) const;
 		void PrintBits( void ) const;
+		void PrintHex( char *out) const;
 		void PrintHex( char *out, size_t outLength ) const;
 		void PrintHex( void ) const;
 
@@ -527,7 +531,7 @@ namespace SLNet
 		void SetReadOffset( const BitSize_t newReadOffset ) {readOffset=newReadOffset;}
 
 		/// \brief Returns the number of bits left in the stream that haven't been read
-		inline BitSize_t GetNumberOfUnreadBits( void ) const {return numberOfBitsUsed - readOffset;}
+		inline BitSize_t GetNumberOfUnreadBits( void ) const { return readOffset > numberOfBitsUsed ? 0 : numberOfBitsUsed - readOffset; }
 
 		/// \brief Makes a copy of the internal data for you \a _data will point to
 		/// the stream. Partial bytes are left aligned.
@@ -1303,7 +1307,7 @@ namespace SLNet
 	template <>
 		inline bool BitStream::Read(bool &outTemplateVar)
 	{
-		if ( readOffset + 1 > numberOfBitsUsed )
+		if (GetNumberOfUnreadBits() == 0)
 			return false;
 
 		if ( data[ readOffset >> 3 ] & ( 0x80 >> ( readOffset & 7 ) ) )   // Is it faster to just write it out here?
@@ -1353,7 +1357,7 @@ namespace SLNet
 	inline bool BitStream::Read(uint24_t &outTemplateVar)
 	{
 		AlignReadToByteBoundary();
-		if ( readOffset + 3*8 > numberOfBitsUsed )
+		if (GetNumberOfUnreadBits() < 3*8)
 			return false;
 
 		if (IsBigEndian()==false)
@@ -1397,6 +1401,10 @@ namespace SLNet
 		inline bool BitStream::Read(char *&varString)
 	{
 		return RakString::Deserialize(varString,this);
+	}
+	inline bool BitStream::Read(wchar_t *&varString)
+	{
+		return RakWString::Deserialize(varString, this);
 	}
 	inline bool BitStream::Read(wchar_t *&varString, size_t varStringLength)
 	{
@@ -1530,6 +1538,10 @@ namespace SLNet
 	inline bool BitStream::ReadCompressed(char *&outTemplateVar)
 	{
 		return RakString::DeserializeCompressed(outTemplateVar,this,false);
+	}
+	inline bool BitStream::ReadCompressed(wchar_t *&outTemplateVar)
+	{
+		return RakWString::Deserialize(outTemplateVar, this);
 	}
 	inline bool BitStream::ReadCompressed(wchar_t *&outTemplateVar, size_t varStringLength)
 	{

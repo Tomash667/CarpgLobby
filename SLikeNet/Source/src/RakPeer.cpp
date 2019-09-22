@@ -3,11 +3,11 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2019, SLikeSoft UG (haftungsbeschrÃ¤nkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -184,7 +184,7 @@ Packet *RakPeer::AllocPacket(unsigned dataSize, unsigned char *data, const char 
 	return p;
 }
 
-STATIC_FACTORY_DEFINITIONS(RakPeerInterface,RakPeer) 
+STATIC_FACTORY_DEFINITIONS(RakPeerInterface,RakPeer)
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Constructor
@@ -1092,8 +1092,6 @@ void RakPeer::Shutdown( unsigned int blockDuration, unsigned char orderingChanne
 		pluginListNTS[i]->OnRakPeerShutdown();
 	}
 
-	activeSystemListSize=0;
-
 	quitAndDataEvents.SetEvent();
 
 	endThreads = true;
@@ -1125,6 +1123,8 @@ void RakPeer::Shutdown( unsigned int blockDuration, unsigned char orderingChanne
 		endThreads = true;
 		RakSleep(15);
 	}
+
+	activeSystemListSize = 0;
 
 	/*
 	timeout = SLNet::GetTimeMS()+1000;
@@ -1593,7 +1593,7 @@ Packet* RakPeer::Receive( void )
 				break;
 			}
 		}
-	
+
 	} while(packet==0);
 
 #ifdef _DEBUG
@@ -2574,22 +2574,17 @@ int RakPeer::GetMTUSize( const SystemAddress target ) const
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 unsigned int RakPeer::GetNumberOfAddresses( void )
 {
-
-	if (IsActive()==false)
-	{
+	if (IsActive() == false) {
 		FillIPList();
 	}
 
-	int i = 0;
+	for (int i = 0; i < MAXIMUM_NUMBER_OF_INTERNAL_IDS && ipList[i] != UNASSIGNED_SYSTEM_ADDRESS; i++) {
+		if (ipList[i] == UNASSIGNED_SYSTEM_ADDRESS) {
+			return i; // first unassigned address entry found -> end of address list reached
+		}
+	}
 
-	while ( ipList[ i ]!=UNASSIGNED_SYSTEM_ADDRESS )
-		i++;
-
-	return i;
-
-
-
-
+	return MAXIMUM_NUMBER_OF_INTERNAL_IDS;
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2609,7 +2604,7 @@ const char* RakPeer::GetLocalIP( unsigned int index )
 
 
 	static char str[128];
-	ipList[index].ToString(false,str,128);
+	ipList[index].ToString(false,str,static_cast<size_t>(128));
 	return str;
 
 
@@ -3008,7 +3003,7 @@ bool RakPeer::SendOutOfBand(const char *host, unsigned short remotePort, const c
 	{
 		bitStream.Write(data, dataLength);
 	}
-	
+
 	unsigned int realIndex = GetRakNetSocketFromUserConnectionSocketIndex(connectionSocketIndex);
 
 	/*
@@ -3019,7 +3014,7 @@ bool RakPeer::SendOutOfBand(const char *host, unsigned short remotePort, const c
 	unsigned i;
 	for (i=0; i < pluginListNTS.Size(); i++)
 		pluginListNTS[i]->OnDirectSocketSend((const char*)bitStream.GetData(), bitStream.GetNumberOfBitsUsed(), systemAddress);
-	
+
 	SocketLayer::SendTo( socketList[realIndex], (const char*)bitStream.GetData(), (int) bitStream.GetNumberOfBytesUsed(), systemAddress, _FILE_AND_LINE_ );
 	*/
 
@@ -3643,7 +3638,7 @@ RakPeer::RemoteSystemStruct * RakPeer::AssignSystemAddressToRemoteSystemList( co
 			else
 			{
 				char str[256];
-				bindingAddress.ToString(true,str,256);
+				bindingAddress.ToString(true,str,static_cast<size_t>(256));
 				// See if this is an internal IP address.
 				// If so, force binding on it so we reply on the same IP address as they sent to.
 				unsigned int ipListIndex, foundIndex=(unsigned int)-1;
@@ -4187,7 +4182,7 @@ void RakPeer::SendBuffered( const char *data, BitSize_t numberOfBitsToSend, Pack
 		bufferedCommands.Deallocate(bcs, _FILE_AND_LINE_);
 		return;
 	}
-	
+
 	RakAssert( !( reliability >= NUMBER_OF_RELIABILITIES || reliability < 0 ) );
 	RakAssert( !( priority > NUMBER_OF_PRIORITIES || priority < 0 ) );
 	RakAssert( !( orderingChannel >= NUMBER_OF_ORDERED_STREAMS ) );
@@ -4535,7 +4530,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 
 	char str1[64];
-	systemAddress.ToString(false, str1,64);
+	systemAddress.ToString(false, str1,static_cast<size_t>(64));
 	if (rakPeer->IsBanned( str1 ))
 	{
 		for (i=0; i < rakPeer->pluginListNTS.Size(); i++)
@@ -4675,7 +4670,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 			SLNet::Time ping;
 			bsIn.Read(ping);
 			bsIn.Read(packet->guid);
-			
+
 			SLNet::BitStream bsOut((unsigned char*) packet->data, packet->length, false);
 			bsOut.ResetWritePointer();
 			bsOut.Write((unsigned char)ID_UNCONNECTED_PONG);
@@ -5191,7 +5186,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 			if (rakPeer->_using_security)
 			{
-				systemAddress.ToString(false, str1, 64);
+				systemAddress.ToString(false, str1, static_cast<size_t>(64));
 				requiresSecurityOfThisClient=rakPeer->IsInSecurityExceptionList(str1)==false;
 
 				uint32_t cookie;
@@ -5739,7 +5734,7 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 					bitStream.PadWithZeroToByteLength(mtuSizes[MTUSizeIndex]-UDP_HEADER_SIZE);
 
 					char str[256];
-					rcs->systemAddress.ToString(true,str,256);
+					rcs->systemAddress.ToString(true,str,static_cast<size_t>(256));
 
 					//RAKNET_DEBUG_PRINTF("%i:IOCR, ", __LINE__);
 
@@ -5945,7 +5940,7 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 #endif
 
 						char str1[64];
-						systemAddress.ToString(false, str1, 64);
+						systemAddress.ToString(false, str1, static_cast<size_t>(64));
 						AddToBanList(str1, remoteSystem->reliabilityLayer.GetTimeoutTime());
 
 
@@ -6224,7 +6219,7 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 				// To be thread safe, this has to be called in the same thread as HandleSocketReceiveFromConnectedPlayer
 				bitSize = remoteSystem->reliabilityLayer.Receive( &data );
 			}
-		
+
 	}
 
 	return true;
@@ -6316,11 +6311,17 @@ RAK_THREAD_DECLARATION(SLNet::UpdateNetworkLoop)
 		+ cat::AuthenticatedEncryption::OVERHEAD_BYTES
 #endif
 		);
-// 
+//
 	rakPeer->isMainLoopThreadActive = true;
 
-	while ( rakPeer->endThreads == false )
+	bool running = true;
+	while ( running )
 	{
+		if (rakPeer->endThreads) {
+			// allow just one more final update-run prior to shutting down this thread to make sure that outstanding acks are still sent and the peers don't unnecessary wait for already retrieved packets
+			// note: this fixes part of SLNET-123
+			running = false;
+		}
 // #ifdef _DEBUG
 // 		// Sanity check, make sure RunUpdateCycle does not block or not otherwise get called for a long time
 // 		RakNetTime thisCall=SLNet::GetTime();
