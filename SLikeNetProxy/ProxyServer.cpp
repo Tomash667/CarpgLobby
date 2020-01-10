@@ -47,6 +47,9 @@ bool ProxyServer::Start(int players, int port, Callback callback)
 
 bool ProxyServer::Init(int players, int port)
 {
+	this->players = players;
+	this->port = port;
+
 	buf = new BitStream;
 	Info("Initializing proxy server.");
 	closing = false;
@@ -218,6 +221,17 @@ void ProxyServer::Shutdown()
 	Info("Closing proxy server.");
 	thread.join();
 	Cleanup();
+}
+
+void ProxyServer::Restart()
+{
+	Info("Restarting proxy server.");
+	closing = true;
+	thread.join();
+	Cleanup();
+	Init(players, port);
+	Info("Starting proxy server thread.");
+	thread = std::thread(&ProxyServer::Run, this);
 }
 
 void ProxyServer::Notify(MsgType type, cstring str)

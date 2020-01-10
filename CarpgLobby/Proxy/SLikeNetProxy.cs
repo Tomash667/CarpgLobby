@@ -19,6 +19,9 @@ namespace CarpgLobby.Proxy
         [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
         private static extern void ShutdownProxy();
 
+        [DllImport("SLikeNetProxy.dll", CallingConvention = CallingConvention.StdCall)]
+        private static extern void RestartProxy();
+
         public void Init()
         {
             callback = new Callback(HandleMessage);
@@ -128,6 +131,11 @@ namespace CarpgLobby.Proxy
         public void Shutdown()
         {
             ShutdownProxy();
+        }
+
+        public void Restart()
+        {
+            RestartProxy();
         }
     }
 }

@@ -20,6 +20,7 @@ public:
 	bool Init(int players, int port);
 	void Run();
 	void Shutdown();
+	void Restart();
 	void Cleanup();
 	void Info(cstring msg) { Notify(MSG_INFO, msg); }
 	void Error(cstring msg) { Notify(MSG_ERROR, msg); }
@@ -34,5 +35,6 @@ public:
 	SLNet::BitStream* buf;
 	std::thread thread;
 	vector<Server*> servers;
+	int players, port;
 	bool closing;
 };
