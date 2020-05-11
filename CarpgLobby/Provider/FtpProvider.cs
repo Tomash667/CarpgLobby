@@ -7,7 +7,7 @@ namespace CarpgLobby.Provider
 {
     public class FtpProvider
     {
-        private static readonly string path = "/domains/carpg.pl/public_html/carpgdata/wersja";
+        private static readonly string path = "/domains/carpg.pl/public_html/carpgdata/wersja.bin";
         private static readonly uint sign = 0x475052CA;
 
         public bool Enabled => !string.IsNullOrWhiteSpace(Settings.Default.FtpHost);
