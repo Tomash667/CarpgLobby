@@ -21,15 +21,39 @@ namespace CarpgLobby.Utils
             return ((major & 0xFF) << 16) | ((minor & 0xFF) << 8) | (patch & 0xFF);
         }
 
+        public static (int major, int minor, int patch) Split(int version)
+        {
+            return (((version & 0xFF0000) >> 16),
+                ((version & 0xFF00) >> 8),
+                (version & 0xFF));
+        }
+
         public static string ToString(int version)
         {
-            int major = ((version & 0xFF0000) >> 16);
-            int minor = ((version & 0xFF00) >> 8);
-            int patch = (version & 0xFF);
+            (int major, int minor, int patch) = Split(version);
             if (patch == 0)
                 return $"{major}.{minor}";
             else
                 return $"{major}.{minor}.{patch}";
+        }
+
+        public static int RemovePatch(int version)
+        {
+            uint ver = (uint)version;
+            ver &= 0xFFFFFF00;
+            return (int)ver;
+        }
+
+        public static bool IsPatch(int version)
+        {
+            int patch = (version & 0xFF);
+            return patch != 0;
+        }
+
+        public static int Previous(int version)
+        {
+            (int major, int minor, int patch) = Split(version);
+            return (major << 16) | ((minor - 1) << 8) | patch;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.IO;
 
 namespace CarpgLobby.Provider
 {
-    public class FtpProvider
+    class FtpProvider
     {
         private static readonly string path = "/domains/carpg.pl/public_html/carpgdata/wersja.bin";
         private static readonly uint sign = 0x475052CA;

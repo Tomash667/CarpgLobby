@@ -2,7 +2,7 @@
 
 namespace CarpgLobby.Provider
 {
-    public class Server
+    class ServerDto
     {
         public int ServerID { get; set; }
         public string Guid { get; set; }

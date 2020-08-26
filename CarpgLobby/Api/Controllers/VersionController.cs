@@ -10,17 +10,36 @@ namespace CarpgLobby.Api.Controllers
     {
         // Get version
         [Route("api/version")]
-        public GetVersionResponse GetVersion()
+        public GetVersionResponse GetVersion(int? ver = null, string lang = null)
         {
             return HandleRequest(() =>
             {
-                Logger.Verbose($"Get version from {Ip}.");
-                return new GetVersionResponse
+                if (ver.HasValue)
                 {
-                    Ok = true,
-                    Version = Lobby.Instance.Version,
-                    VersionString = Lobby.Instance.VersionStr
-                };
+                    Logger.Verbose($"Get new version from {Ip}.");
+                    GetVersionResponse response = new GetVersionResponse
+                    {
+                        Ok = true,
+                        Version = Lobby.Instance.Version,
+                        VersionString = Lobby.Instance.VersionStr
+                    };
+                    if (ver.Value != response.Version)
+                    {
+                        response.Changelog = Lobby.Instance.GetChangelogSimple(lang);
+                        response.Update = Lobby.Instance.CanUpdate(ver.Value);
+                    }
+                    return response;
+                }
+                else
+                {
+                    Logger.Verbose($"Get version from {Ip}.");
+                    return new GetVersionResponse
+                    {
+                        Ok = true,
+                        Version = Lobby.Instance.Version,
+                        VersionString = Lobby.Instance.VersionStr
+                    };
+                }
             });
         }
 
@@ -48,7 +67,7 @@ namespace CarpgLobby.Api.Controllers
         // Set version
         [Route("api/version")]
         [TokenAuthentication]
-        public BaseResponse PostVersion([FromUri]string version, [FromBody]Dictionary<string, string> changelog)
+        public BaseResponse PostVersion([FromUri] string version, [FromBody] Dictionary<string, string> changelog)
         {
             return HandleRequest(() =>
             {
@@ -58,7 +77,7 @@ namespace CarpgLobby.Api.Controllers
                 {
                     foreach (var item in changelog)
                     {
-                        Logger.Verbose($"Set changelog '{item.Key}' to '{item.Value}' from {Ip}.");
+                        Logger.Info($"Set changelog '{item.Key}' to '{item.Value}' from {Ip}.");
                         Lobby.Instance.SetChangelog(item.Key, item.Value);
                     }
                 }
@@ -68,7 +87,7 @@ namespace CarpgLobby.Api.Controllers
 
         // Get version changelog (for all or single language)
         [Route("api/version/changelog")]
-        public GetChangelogResponse GetChangelog([FromUri]string lang)
+        public GetChangelogResponse GetChangelog([FromUri] string lang)
         {
             return HandleRequest(() =>
             {
@@ -84,11 +103,11 @@ namespace CarpgLobby.Api.Controllers
         // Set version changelog for language
         [Route("api/version/changelog")]
         [TokenAuthentication]
-        public BaseResponse PostChangelog([FromUri]string lang, [FromBody]string changelog)
+        public BaseResponse PostChangelog([FromUri] string lang, [FromBody] string changelog)
         {
             return HandleRequest(() =>
             {
-                Logger.Verbose($"Set changelog '{lang}' to '{changelog}' from {Ip}.");
+                Logger.Info($"Set changelog '{lang}' to '{changelog}' from {Ip}.");
                 Lobby.Instance.SetChangelog(lang, changelog);
                 return new BaseResponse { Ok = true };
             });

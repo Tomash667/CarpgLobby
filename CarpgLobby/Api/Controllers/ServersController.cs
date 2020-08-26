@@ -10,6 +10,7 @@ namespace CarpgLobby.Api.Controllers
     {
         // Get info
         [Route("api/servers/info")]
+        [TokenAuthentication]
         public GetInfoResponse GetInfo()
         {
             return HandleRequest(() =>

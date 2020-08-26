@@ -91,7 +91,7 @@ namespace CarpgLobby.Proxy
                         int players = reader.ReadInt32();
                         int flags = reader.ReadInt32();
                         int version = reader.ReadInt32();
-                        Server server = Lobby.Instance.CreateServer(new Server
+                        ServerDto server = Lobby.Instance.CreateServer(new ServerDto
                         {
                             Name = name,
                             Guid = guid,

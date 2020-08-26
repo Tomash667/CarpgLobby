@@ -9,6 +9,7 @@ namespace CarpgLobby.Provider
     class Repository
     {
         public Dictionary<string, string> changelog;
+        public List<UpdateDto> updates;
         public int version;
         private static string Path => AppDomain.CurrentDomain.BaseDirectory + "db.json";
 
@@ -58,6 +59,7 @@ namespace CarpgLobby.Provider
         private void Reset()
         {
             changelog = new Dictionary<string, string>();
+            updates = new List<UpdateDto>();
             version = 0;
         }
     }

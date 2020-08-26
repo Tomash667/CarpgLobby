@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="Api\Controllers\BaseController.cs" />
     <Compile Include="Api\Controllers\ServersController.cs" />
+    <Compile Include="Api\Controllers\UpdateController.cs" />
     <Compile Include="Api\Controllers\VersionController.cs" />
     <Compile Include="Api\Model\BaseResponse.cs" />
     <Compile Include="Api\Model\Change.cs" />
@@ -94,9 +95,12 @@
     <Compile Include="Api\Model\GetChangesResponse.cs" />
     <Compile Include="Api\Model\GetInfoResponse.cs" />
     <Compile Include="Api\Model\GetServersResponse.cs" />
+    <Compile Include="Api\Model\GetUpdateResponse.cs" />
     <Compile Include="Api\Model\GetVersionDetailsResponse.cs" />
     <Compile Include="Api\Model\GetVersionResponse.cs" />
+    <Compile Include="Api\Model\PostUpdateRequest.cs" />
     <Compile Include="Api\Model\Server.cs" />
+    <Compile Include="Api\Model\Update.cs" />
     <Compile Include="Api\Startup.cs" />
     <Compile Include="Api\TokenAuthenticationAttribute.cs" />
     <Compile Include="Extensions\BinaryReaderExtensions.cs" />
@@ -111,14 +115,15 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Provider\Change.cs" />
+    <Compile Include="Provider\ChangeDto.cs" />
     <Compile Include="Provider\FtpProvider.cs" />
     <Compile Include="Provider\Lobby.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\ProviderException.cs" />
     <Compile Include="Provider\Repository.cs" />
-    <Compile Include="Provider\Server.cs" />
+    <Compile Include="Provider\ServerDto.cs" />
+    <Compile Include="Provider\UpdateDto.cs" />
     <Compile Include="Proxy\MsgType.cs" />
     <Compile Include="Proxy\StatType.cs" />
     <Compile Include="Utils\Logger.cs" />

@@ -2,7 +2,7 @@
 
 namespace CarpgLobby.Provider
 {
-    public class ProviderException : Exception
+    class ProviderException : Exception
     {
         public ProviderException(string msg) : base(msg)
         {

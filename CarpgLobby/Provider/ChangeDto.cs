@@ -3,7 +3,7 @@ using System;
 
 namespace CarpgLobby.Provider
 {
-    public class Change
+    class ChangeDto
     {
         public ChangeType Type { get; set; }
         public int ServerID { get; set; }
