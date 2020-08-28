@@ -42,7 +42,7 @@ namespace CarpgLobby.Provider
                     writer.Write(sign);
                     writer.Write(version);
                     client.UploadDataType = FtpDataType.Binary;
-                    client.Upload(stream, path, FtpExists.Overwrite);
+                    client.Upload(stream, path, FtpRemoteExists.Overwrite);
                 }
             }
         }
