@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Controllers\BaseController.cs" />
+    <Compile Include="Api\Controllers\DiagnosticsController.cs" />
     <Compile Include="Api\Controllers\ServersController.cs" />
     <Compile Include="Api\Controllers\UpdateController.cs" />
     <Compile Include="Api\Controllers\VersionController.cs" />
