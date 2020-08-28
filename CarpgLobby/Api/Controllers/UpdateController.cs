@@ -22,7 +22,12 @@ namespace CarpgLobby.Api.Controllers
                     {
                         Ok = true,
                         Files = updates.OrderBy(x => x.To)
-                            .Select(x => new Update { Version = x.To, Path = x.Path })
+                            .Select(x => new Update
+                            {
+                                Version = x.To,
+                                Path = x.Path,
+                                Crc = x.Crc
+                            })
                             .ToList()
                     };
                 }
@@ -46,9 +51,10 @@ namespace CarpgLobby.Api.Controllers
                 Logger.Info($"Post update from {request.From} to {request.To}.");
                 UpdateDto update = new UpdateDto
                 {
-                    From = Utils.Version.ParseVersion(request.From),
-                    To = Utils.Version.ParseVersion(request.To),
-                    Path = request.Path
+                    From = Version.ParseVersion(request.From),
+                    To = Version.ParseVersion(request.To),
+                    Path = request.Path,
+                    Crc = request.Crc
                 };
                 Lobby.Instance.AddUpdate(update);
                 return new BaseResponse { Ok = true };

@@ -255,8 +255,10 @@ namespace CarpgLobby.Provider
 
         public List<UpdateDto> GetUpdates(int from)
         {
-            from = Utils.Version.RemovePatch(from);
             List<UpdateDto> updates = new List<UpdateDto>();
+            if (from == Version)
+                return updates;
+            from = Utils.Version.RemovePatch(from);
             int current = Version;
             int len = 0;
             while (true)
